@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodMusic — Mi perfil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ==================== FONDO ANIMADO ==================== -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <span class="logo-icon-sm">♪</span>
+            <span class="navbar-title">MoodMusic</span>
+        </div>
+        <div class="navbar-links">
+            <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+            <a href="{{ url_for('perfil') }}" class="nav-link active">Mi perfil</a>
+            <a href="{{ url_for('logout') }}" class="nav-link nav-link-logout">Salir</a>
+        </div>
+    </nav>
+
+    <!-- ==================== CONTENIDO ==================== -->
+    <main class="main-content">
+
+        <section class="section-greeting">
+            <h2 class="greeting-title">Mi <span class="highlight">perfil</span></h2>
+            <p class="greeting-subtitle">Tu información guardada en el sistema.</p>
+        </section>
+
+        <!-- Datos del perfil -->
+        <section class="section-card">
+            <h3 class="section-title">Información general</h3>
+            <div class="perfil-datos">
+                <div class="perfil-dato">
+                    <span class="perfil-label">ID de usuario</span>
+                    <span class="perfil-valor">{{ perfil.usuario_id }}</span>
+                </div>
+                <div class="perfil-dato">
+                    <span class="perfil-label">Estado de ánimo actual</span>
+                    <span class="perfil-valor">
+                        {{ perfil.estado_animo if perfil.estado_animo else "No definido" }}
+                    </span>
+                </div>
+                <div class="perfil-dato">
+                    <span class="perfil-label">Contexto actual</span>
+                    <span class="perfil-valor">
+                        {{ perfil.contexto if perfil.contexto else "No definido" }}
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Canciones favoritas -->
+        <section class="section-card">
+            <h3 class="section-title">Canciones favoritas</h3>
+            {% if perfil.canciones_gustadas %}
+                <div class="canciones-lista">
+                    {% for cancion in perfil.canciones_gustadas %}
+                    <div class="cancion-lista-item">
+                        <span class="cancion-lista-icon">♥</span>
+                        <span>{{ cancion }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">Aún no tienes canciones favoritas.</p>
+            {% endif %}
+        </section>
+
+        <!-- Canciones descartadas -->
+        <section class="section-card">
+            <h3 class="section-title">Canciones descartadas</h3>
+            {% if perfil.canciones_no_gustadas %}
+                <div class="canciones-lista">
+                    {% for cancion in perfil.canciones_no_gustadas %}
+                    <div class="cancion-lista-item">
+                        <span class="cancion-lista-icon cancion-lista-icon-no">✕</span>
+                        <span>{{ cancion }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">No has descartado ninguna canción.</p>
+            {% endif %}
+        </section>
+
+        <div class="perfil-volver">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                ← Volver al dashboard
+            </a>
+        </div>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
