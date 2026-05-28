@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodMusic — Iniciar sesión</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-body">
+
+    <!-- ==================== FONDO ANIMADO ==================== -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ==================== CONTENEDOR LOGIN ==================== -->
+    <main class="auth-container">
+
+        <!-- Logo y título -->
+        <div class="auth-header">
+            <div class="logo-icon">♪</div>
+            <h1 class="logo-text">MoodMusic</h1>
+            <p class="auth-subtitle">Tu música, según tu estado de ánimo</p>
+        </div>
+
+        <!-- Mensaje de error -->
+        {% if error %}
+        <div class="alert alert-error">
+            <span class="alert-icon">⚠</span>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Formulario -->
+        <form class="auth-form" method="POST" action="{{ url_for('login') }}">
+
+            <div class="form-group">
+                <label class="form-label" for="usuario_id">ID de usuario</label>
+                <input
+                    class="form-input"
+                    type="text"
+                    id="usuario_id"
+                    name="usuario_id"
+                    placeholder="Ej: usuario123"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="nombre">Nombre</label>
+                <input
+                    class="form-input"
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    placeholder="Tu nombre"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Correo electrónico</label>
+                <input
+                    class="form-input"
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="tu@correo.com"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+
+            <button class="btn btn-primary btn-full" type="submit">
+                <span>Entrar</span>
+                <span class="btn-icon">→</span>
+            </button>
+
+        </form>
+
+        <p class="auth-footer">
+            Si ya tienes cuenta, ingresa tu ID y te reconoceremos.
+        </p>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
