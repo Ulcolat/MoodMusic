@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
     <!-- ==================== FONDO ANIMADO ==================== -->
@@ -65,16 +67,19 @@
         <section class="section-card">
             <h3 class="section-title">Canciones favoritas</h3>
             {% if perfil.canciones_gustadas %}
-                <div class="canciones-lista">
-                    {% for cancion in perfil.canciones_gustadas %}
-                    <div class="cancion-lista-item">
-                        <span class="cancion-lista-icon">♥</span>
-                        <span>{{ cancion }}</span>
+            <div class="canciones-lista">
+                {% for cancion in perfil.canciones_gustadas %}
+                <div class="cancion-lista-item">
+                    <span class="cancion-lista-icon">♥</span>
+                    <div>
+                        <span class="cancion-titulo">{{ cancion.titulo }}</span>
+                        <span class="cancion-artista"> — {{ cancion.artista }}</span>
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
+            </div>
             {% else %}
-                <p class="empty-state">Aún no tienes canciones favoritas.</p>
+            <p class="empty-state">Aún no tienes canciones favoritas.</p>
             {% endif %}
         </section>
 
@@ -82,16 +87,19 @@
         <section class="section-card">
             <h3 class="section-title">Canciones descartadas</h3>
             {% if perfil.canciones_no_gustadas %}
-                <div class="canciones-lista">
-                    {% for cancion in perfil.canciones_no_gustadas %}
-                    <div class="cancion-lista-item">
-                        <span class="cancion-lista-icon cancion-lista-icon-no">✕</span>
-                        <span>{{ cancion }}</span>
+            <div class="canciones-lista">
+                {% for cancion in perfil.canciones_no_gustadas %}
+                <div class="cancion-lista-item">
+                    <span class="cancion-lista-icon cancion-lista-icon-no">✕</span>
+                    <div>
+                        <span class="cancion-titulo">{{ cancion.titulo }}</span>
+                        <span class="cancion-artista"> — {{ cancion.artista }}</span>
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
+            </div>
             {% else %}
-                <p class="empty-state">No has descartado ninguna canción.</p>
+            <p class="empty-state">No has descartado ninguna canción.</p>
             {% endif %}
         </section>
 
@@ -105,4 +113,5 @@
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
+
 </html>

@@ -183,44 +183,50 @@ class AgentePerfilUsuario:
 
     def obtener_canciones_gustadas(self, usuario_id):
         """
-        Obtiene la lista de canciones que le gustan al usuario.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
+        Obtiene la lista de canciones que le gustan al usuario
+        con su título y artista reales.
 
         Returns:
-            list: Lista de identificadores de canciones.
+            list: Lista de diccionarios con id, titulo y artista.
         """
         usuario = MM[usuario_id]
-        return [
-            str(cancion).split("#")[-1]
-            for _, _, cancion in self.grafo.triples((usuario, MM.leGusta, None))
-        ]
+        canciones = []
+        for _, _, cancion in self.grafo.triples((usuario, MM.leGusta, None)):
+            cancion_id = str(cancion).split("#")[-1]
+            titulo = self.grafo.value(cancion, MM.titulo) or cancion_id
+            artista = self.grafo.value(cancion, MM.artista) or ""
+            canciones.append({
+                "id": cancion_id,
+                "titulo": str(titulo),
+                "artista": str(artista),
+            })
+        return canciones
 
     def obtener_canciones_no_gustadas(self, usuario_id):
         """
-        Obtiene la lista de canciones que no le gustan al usuario.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
+        Obtiene la lista de canciones descartadas por el usuario
+        con su título y artista reales.
 
         Returns:
-            list: Lista de identificadores de canciones.
+            list: Lista de diccionarios con id, titulo y artista.
         """
         usuario = MM[usuario_id]
-        return [
-            str(cancion).split("#")[-1]
-            for _, _, cancion in self.grafo.triples((usuario, MM.noLeGusta, None))
-        ]
-
+        canciones = []
+        for _, _, cancion in self.grafo.triples((usuario, MM.noLeGusta, None)):
+            cancion_id = str(cancion).split("#")[-1]
+            titulo = self.grafo.value(cancion, MM.titulo) or cancion_id
+            artista = self.grafo.value(cancion, MM.artista) or ""
+            canciones.append({
+                "id": cancion_id,
+                "titulo": str(titulo),
+                "artista": str(artista),
+            })
+        return canciones
     # ==================== PERFIL COMPLETO ====================
 
     def obtener_perfil(self, usuario_id):
         """
         Retorna el perfil completo del usuario.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
 
         Returns:
             dict: Diccionario con toda la información del perfil.

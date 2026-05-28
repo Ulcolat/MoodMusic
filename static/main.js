@@ -82,6 +82,13 @@ function construirTarjetaCancion(cancion, mostrarAcciones = true) {
     const acciones = mostrarAcciones ? `
         <div class="cancion-acciones">
             <button
+                class="btn-accion btn-preview"
+                data-titulo="${cancion.titulo}"
+                data-artista="${cancion.artista}"
+                title="Preview 30s">
+                ▶
+            </button>
+            <button
                 class="btn-accion btn-gusta"
                 data-cancion="${cancion.id}"
                 title="Me gusta">
@@ -94,7 +101,17 @@ function construirTarjetaCancion(cancion, mostrarAcciones = true) {
                 ✕
             </button>
         </div>
-    ` : "";
+    ` : `
+        <div class="cancion-acciones">
+            <button
+                class="btn-accion btn-preview"
+                data-titulo="${cancion.titulo}"
+                data-artista="${cancion.artista}"
+                title="Preview 30s">
+                ▶
+            </button>
+        </div>
+    `;
 
     return `
         <div class="cancion-card">
@@ -253,6 +270,15 @@ function inicializarBotonesAccion() {
             }
         });
     });
+
+    // Botones preview
+    document.querySelectorAll(".btn-preview").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const titulo = btn.dataset.titulo;
+            const artista = btn.dataset.artista;
+            reproducirPreview(titulo, artista, btn);
+        });
+    });
 }
 
 // ==================== EXPLORAR POR GÉNERO ====================
@@ -304,6 +330,70 @@ function inicializarExplorarGenero() {
             }
         });
     });
+}
+
+// ==================== PREVIEW DE CANCIÓN ====================
+
+let audioActual = null;
+
+/**
+ * Busca y reproduce el preview de 30 segundos de una canción.
+ * Si hay uno reproduciéndose, lo detiene primero.
+ * @param {string} titulo - Título de la canción.
+ * @param {string} artista - Artista de la canción.
+ * @param {HTMLElement} boton - Botón que disparó la acción.
+ */
+async function reproducirPreview(titulo, artista, boton) {
+    // Si el mismo botón está activo, detener
+    if (boton.classList.contains("preview-activo")) {
+        audioActual.pause();
+        audioActual = null;
+        boton.textContent = "▶";
+        boton.classList.remove("preview-activo");
+        return;
+    }
+
+    // Detener cualquier audio previo
+    if (audioActual) {
+        audioActual.pause();
+        audioActual = null;
+        document.querySelectorAll(".btn-preview").forEach((b) => {
+            b.textContent = "▶";
+            b.classList.remove("preview-activo");
+        });
+    }
+
+    boton.textContent = "...";
+
+    try {
+        const respuesta = await fetch(
+            `/preview/${encodeURIComponent(titulo)}/${encodeURIComponent(artista)}`
+        );
+        const datos = await respuesta.json();
+
+        if (datos.error) {
+            mostrarToast("Preview no disponible para esta canción.", "error");
+            boton.textContent = "▶";
+            return;
+        }
+
+        audioActual = new Audio(datos.preview_url);
+        audioActual.volume = 0.7;
+        audioActual.play();
+        boton.textContent = "■";
+        boton.classList.add("preview-activo");
+
+        // Al terminar los 30 segundos
+        audioActual.addEventListener("ended", () => {
+            boton.textContent = "▶";
+            boton.classList.remove("preview-activo");
+            audioActual = null;
+        });
+
+    } catch {
+        mostrarToast("Error al cargar el preview.", "error");
+        boton.textContent = "▶";
+    }
 }
 
 // ==================== INICIALIZACIÓN ====================

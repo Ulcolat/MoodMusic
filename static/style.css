@@ -778,3 +778,25 @@ body {
         gap: 0.25rem;
     }
 }
+
+/* ==================== PREVIEW ==================== */
+
+.btn-preview {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    border-color: rgba(0, 245, 255, 0.3);
+}
+
+.btn-preview:hover {
+    background: var(--accent-cyan-dim);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.2);
+}
+
+.btn-preview.preview-activo {
+    background: var(--accent-cyan-dim);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 12px rgba(0, 245, 255, 0.3);
+}

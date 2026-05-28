@@ -234,6 +234,32 @@ def perfil():
         nombre=session.get("nombre")
     )
 
+@app.route("/preview/<titulo>/<artista>")
+def preview(titulo, artista):
+    """
+    Busca en la API de Deezer el preview de 30 segundos
+    de una canción por título y artista.
+
+    Returns:
+        JSON con la URL del preview o error si no se encuentra.
+    """
+    import urllib.request
+    import json as json_lib
+    import urllib.parse
+
+    query = urllib.parse.quote(f"{titulo} {artista}")
+    url = f"https://api.deezer.com/search?q={query}&limit=1"
+
+    try:
+        with urllib.request.urlopen(url, timeout=5) as respuesta:
+            datos = json_lib.loads(respuesta.read())
+            if datos.get("data"):
+                preview_url = datos["data"][0].get("preview")
+                if preview_url:
+                    return jsonify({"preview_url": preview_url})
+        return jsonify({"error": "Preview no disponible"}), 404
+    except Exception:
+        return jsonify({"error": "Error al conectar con Deezer"}), 500
 
 # ==================== ARRANQUE ====================
 
