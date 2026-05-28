@@ -1,0 +1,41 @@
+# ==================== ENTORNO Y CREDENCIALES ====================
+.env
+*.env
+.env.*
+
+# ==================== DATOS DE USUARIOS (SENSIBLE) ====================
+datos/grafo.ttl
+datos/usuarios.ttl
+datos/*.ttl
+
+# ==================== CACHÉ PYTHON ====================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ==================== ENTORNO VIRTUAL ====================
+venv/
+env/
+.venv/
+ENV/
+
+# ==================== IDEs ====================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ==================== SISTEMA OPERATIVO ====================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==================== LOGS ====================
+*.log
+logs/
+
+# ==================== FLASK ====================
+instance/
+.webassets-cache

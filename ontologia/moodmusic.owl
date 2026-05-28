@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/moodmusic#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xml:base="http://www.semanticweb.org/moodmusic#">
+
+    <!-- ==================== ONTOLOGÍA ==================== -->
+    <owl:Ontology rdf:about="http://www.semanticweb.org/moodmusic#">
+        <rdfs:label>MoodMusic Ontología</rdfs:label>
+        <rdfs:comment>Ontología para el sistema de recomendación musical inteligente MoodMusic</rdfs:comment>
+    </owl:Ontology>
+
+    <!-- ==================== CLASES ==================== -->
+
+    <owl:Class rdf:about="#Usuario">
+        <rdfs:label>Usuario</rdfs:label>
+        <rdfs:comment>Persona que interactúa con el sistema MoodMusic</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Cancion">
+        <rdfs:label>Cancion</rdfs:label>
+        <rdfs:comment>Canción disponible en el sistema para ser recomendada</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="#EstadoDeAnimo">
+        <rdfs:label>EstadoDeAnimo</rdfs:label>
+        <rdfs:comment>Estado emocional del usuario en un momento dado</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Contexto">
+        <rdfs:label>Contexto</rdfs:label>
+        <rdfs:comment>Situación o ambiente en el que el usuario escucha música</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Genero">
+        <rdfs:label>Genero</rdfs:label>
+        <rdfs:comment>Género musical de una canción</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Recomendacion">
+        <rdfs:label>Recomendacion</rdfs:label>
+        <rdfs:comment>Sugerencia musical generada por el Agente de Recomendación</rdfs:comment>
+    </owl:Class>
+
+    <!-- ==================== PROPIEDADES DE OBJETO ==================== -->
+
+    <!-- Usuario → EstadoDeAnimo -->
+    <owl:ObjectProperty rdf:about="#tieneEstadoDeAnimo">
+        <rdfs:label>tieneEstadoDeAnimo</rdfs:label>
+        <rdfs:domain rdf:resource="#Usuario"/>
+        <rdfs:range rdf:resource="#EstadoDeAnimo"/>
+        <rdfs:comment>Relaciona un usuario con su estado de ánimo actual</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- Usuario → Contexto -->
+    <owl:ObjectProperty rdf:about="#estaEnContexto">
+        <rdfs:label>estaEnContexto</rdfs:label>
+        <rdfs:domain rdf:resource="#Usuario"/>
+        <rdfs:range rdf:resource="#Contexto"/>
+        <rdfs:comment>Relaciona un usuario con el contexto en el que escucha música</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- Usuario → Cancion (le gusta) -->
+    <owl:ObjectProperty rdf:about="#leGusta">
+        <rdfs:label>leGusta</rdfs:label>
+        <rdfs:domain rdf:resource="#Usuario"/>
+        <rdfs:range rdf:resource="#Cancion"/>
+        <rdfs:comment>Canción que el usuario ha marcado como favorita</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- Usuario → Cancion (no le gusta) -->
+    <owl:ObjectProperty rdf:about="#noLeGusta">
+        <rdfs:label>noLeGusta</rdfs:label>
+        <rdfs:domain rdf:resource="#Usuario"/>
+        <rdfs:range rdf:resource="#Cancion"/>
+        <rdfs:comment>Canción que el usuario ha descartado</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- Cancion → EstadoDeAnimo -->
+    <owl:ObjectProperty rdf:about="#aptoParaAnimo">
+        <rdfs:label>aptoParaAnimo</rdfs:label>
+        <rdfs:domain rdf:resource="#Cancion"/>
+        <rdfs:range rdf:resource="#EstadoDeAnimo"/>
+        <rdfs:comment>Estado de ánimo para el que es adecuada la canción</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- Cancion → Contexto -->
+    <owl:ObjectProperty rdf:about="#aptoParaContexto">
+        <rdfs:label>aptoParaContexto</rdfs:label>
+        <rdfs:domain rdf:resource="#Cancion"/>
+        <rdfs:range rdf:resource="#Contexto"/>
+        <rdfs:comment>Contexto para el que es adecuada la canción</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- Cancion → Genero -->
+    <owl:ObjectProperty rdf:about="#perteneceAGenero">
+        <rdfs:label>perteneceAGenero</rdfs:label>
+        <rdfs:domain rdf:resource="#Cancion"/>
+        <rdfs:range rdf:resource="#Genero"/>
+        <rdfs:comment>Género musical al que pertenece la canción</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- Recomendacion → Cancion -->
+    <owl:ObjectProperty rdf:about="#recomienda">
+        <rdfs:label>recomienda</rdfs:label>
+        <rdfs:domain rdf:resource="#Recomendacion"/>
+        <rdfs:range rdf:resource="#Cancion"/>
+        <rdfs:comment>Canción incluida en una recomendación</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- Recomendacion → Usuario -->
+    <owl:ObjectProperty rdf:about="#dirigidaA">
+        <rdfs:label>dirigidaA</rdfs:label>
+        <rdfs:domain rdf:resource="#Recomendacion"/>
+        <rdfs:range rdf:resource="#Usuario"/>
+        <rdfs:comment>Usuario al que va dirigida la recomendación</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <!-- ==================== PROPIEDADES DE DATOS ==================== -->
+
+    <!-- Cancion → calificacion -->
+    <owl:DatatypeProperty rdf:about="#calificacion">
+        <rdfs:label>calificacion</rdfs:label>
+        <rdfs:domain rdf:resource="#Cancion"/>
+        <rdfs:range rdf:resource="xsd:float"/>
+        <rdfs:comment>Calificación numérica de la canción entre 0.0 y 5.0</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- Cancion → titulo -->
+    <owl:DatatypeProperty rdf:about="#titulo">
+        <rdfs:label>titulo</rdfs:label>
+        <rdfs:domain rdf:resource="#Cancion"/>
+        <rdfs:range rdf:resource="xsd:string"/>
+        <rdfs:comment>Título de la canción</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- Cancion → artista -->
+    <owl:DatatypeProperty rdf:about="#artista">
+        <rdfs:label>artista</rdfs:label>
+        <rdfs:domain rdf:resource="#Cancion"/>
+        <rdfs:range rdf:resource="xsd:string"/>
+        <rdfs:comment>Artista o banda que interpreta la canción</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- Cancion → duracion -->
+    <owl:DatatypeProperty rdf:about="#duracion">
+        <rdfs:label>duracion</rdfs:label>
+        <rdfs:domain rdf:resource="#Cancion"/>
+        <rdfs:range rdf:resource="xsd:string"/>
+        <rdfs:comment>Duración de la canción en formato mm:ss</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- Usuario → nombre -->
+    <owl:DatatypeProperty rdf:about="#nombre">
+        <rdfs:label>nombre</rdfs:label>
+        <rdfs:domain rdf:resource="#Usuario"/>
+        <rdfs:range rdf:resource="xsd:string"/>
+        <rdfs:comment>Nombre del usuario</rdfs:comment>
+    </owl:DatatypeProperty>
+
+    <!-- Usuario → email -->
+    <owl:DatatypeProperty rdf:about="#email">
+        <rdfs:label>email</rdfs:label>
+        <rdfs:domain rdf:resource="#Usuario"/>
+        <rdfs:range rdf:resource="xsd:string"/>
+        <rdfs:comment>Correo electrónico del usuario</rdfs:comment>
+    </owl:DatatypeProperty>
+
+</rdf:RDF>
