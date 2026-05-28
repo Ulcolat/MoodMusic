@@ -4,7 +4,7 @@
 .env.*
 
 # ==================== DATOS DE USUARIOS (SENSIBLE) ====================
-datos/grafo.ttl
+datos/grafos.ttl
 datos/usuarios.ttl
 datos/*.ttl
 
