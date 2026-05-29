@@ -73,9 +73,7 @@
     <!-- RECOMENDACIONES -->
     <section id="secRecomendaciones" class="{% if not recomendaciones %}hidden{% endif %}">
       <h2 class="section-title">🎯 Recomendaciones para ti</h2>
-      {% if perfil.generos_favoritos %}
-      <p class="personaliz-note">Personalizadas según tus géneros favoritos: {{ perfil.generos_favoritos | join(', ') }}</p>
-      {% endif %}
+      
       <div class="song-grid" id="gridRecomendadas">
         {% for c in recomendaciones %}
         {% include 'partials/_song_card.html' %}

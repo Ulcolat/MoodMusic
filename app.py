@@ -14,8 +14,8 @@ app.secret_key = os.environ.get("SECRET_KEY", "moodmusic_dev_key")
 agente_perfil = AgentePerfilUsuario()
 agente_recomendacion = AgenteRecomendacion()
 
-ESTADOS_ANIMO = ["Alegre", "Triste", "Tranquilo", "Energico", "Estresado", "Romantico"]
-CONTEXTOS = ["Ejercicio", "Estudio", "Casa", "Trabajo", "Fiesta", "Descanso"]
+ESTADOS_ANIMO = ["Alegre", "Triste", "Tranquilo", "Energico", "Estresado", "Romantico", "Melancolico", "Motivado", "Relajado"]
+CONTEXTOS = ["Ejercicio", "Estudio", "Casa", "Trabajo", "Fiesta", "Descanso", "Viaje", "Noche", "Gaming"]
 
 def _generos():
     """Géneros derivados del grafo (siempre actualizados)."""

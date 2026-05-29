@@ -2026,15 +2026,6 @@ mm:C_Chop_Suey_System_of_a_Down a mm:Cancion ;
     mm:perteneceAGenero mm:Metal ;
     mm:titulo "Chop Suey!"^^xsd:string .
 
-mm:C_Ché_Ché_Colé_Willie_Colón a mm:Cancion ;
-    mm:aptoParaAnimo mm:Alegre ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Willie Colón"^^xsd:string ;
-    mm:calificacion "2.9"^^xsd:float ;
-    mm:duracion "3:29"^^xsd:string ;
-    mm:perteneceAGenero mm:Salsa ;
-    mm:titulo "Ché Ché Colé"^^xsd:string .
-
 mm:C_Ciega_Sordomuda_Shakira a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -2205,15 +2196,6 @@ mm:C_Como_Toda_Una_Señora_Regueton_Viejo_Reggaetones a mm:Cancion ;
     mm:duracion "3:23"^^xsd:string ;
     mm:perteneceAGenero mm:Reggaeton ;
     mm:titulo "Como Toda Una Señora (Regueton Viejo)"^^xsd:string .
-
-mm:C_Como_en_el_Idilio_Marc_Anthony a mm:Cancion ;
-    mm:aptoParaAnimo mm:Alegre ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Marc Anthony"^^xsd:string ;
-    mm:calificacion "3.2"^^xsd:float ;
-    mm:duracion "4:26"^^xsd:string ;
-    mm:perteneceAGenero mm:Salsa ;
-    mm:titulo "Como en el Idilio"^^xsd:string .
 
 mm:C_Con_Altura_feat_El_Guincho_ROSALÍA a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
@@ -3097,15 +3079,6 @@ mm:C_Drunk_in_Love_feat_JAYZ_Beyoncé a mm:Cancion ;
     mm:perteneceAGenero mm:Pop ;
     mm:titulo "Drunk in Love (feat. JAY-Z)"^^xsd:string .
 
-mm:C_DtMF_Bad_Bunny a mm:Cancion ;
-    mm:aptoParaAnimo mm:Energico ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Bad Bunny"^^xsd:string ;
-    mm:calificacion "4.9"^^xsd:float ;
-    mm:duracion "3:57"^^xsd:string ;
-    mm:perteneceAGenero mm:Urbano ;
-    mm:titulo "DtMF"^^xsd:string .
-
 mm:C_Duality_Slipknot a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
     mm:aptoParaContexto mm:Ejercicio ;
@@ -3123,15 +3096,6 @@ mm:C_Dumb_Nirvana a mm:Cancion ;
     mm:duracion "2:31"^^xsd:string ;
     mm:perteneceAGenero mm:Rock ;
     mm:titulo "Dumb"^^xsd:string .
-
-mm:C_DÁKITI_Bad_Bunny a mm:Cancion ;
-    mm:aptoParaAnimo mm:Energico ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Bad Bunny"^^xsd:string ;
-    mm:calificacion "4.9"^^xsd:float ;
-    mm:duracion "3:25"^^xsd:string ;
-    mm:perteneceAGenero mm:Urbano ;
-    mm:titulo "DÁKITI"^^xsd:string .
 
 mm:C_DÓNDE_Kapo a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
@@ -4735,15 +4699,6 @@ mm:C_Harder_Better_Faster_Stronger_Daft_Punk a mm:Cancion ;
     mm:perteneceAGenero mm:Electronic ;
     mm:titulo "Harder, Better, Faster, Stronger"^^xsd:string .
 
-mm:C_Hasta_Abajo_Don_Omar a mm:Cancion ;
-    mm:aptoParaAnimo mm:Energico ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Don Omar"^^xsd:string ;
-    mm:calificacion "2.9"^^xsd:float ;
-    mm:duracion "3:53"^^xsd:string ;
-    mm:perteneceAGenero mm:Reggaeton ;
-    mm:titulo "Hasta Abajo"^^xsd:string .
-
 mm:C_Hasta_Que_Dios_Diga_Anuel_AA a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -5923,15 +5878,6 @@ mm:C_LOYALTY_Kendrick_Lamar a mm:Cancion ;
     mm:perteneceAGenero mm:HipHop ;
     mm:titulo "LOYALTY."^^xsd:string .
 
-mm:C_LUNA_Feid a mm:Cancion ;
-    mm:aptoParaAnimo mm:Tranquilo ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Feid"^^xsd:string ;
-    mm:calificacion "3.8"^^xsd:float ;
-    mm:duracion "3:16"^^xsd:string ;
-    mm:perteneceAGenero mm:Urbano ;
-    mm:titulo "LUNA"^^xsd:string .
-
 mm:C_LUNCH_Billie_Eilish a mm:Cancion ;
     mm:aptoParaAnimo mm:Triste ;
     mm:aptoParaContexto mm:Casa ;
@@ -6058,15 +6004,6 @@ mm:C_La_Mejor_Música_Feid a mm:Cancion ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "La Mejor Música"^^xsd:string .
 
-mm:C_La_Murga_Willie_Colón a mm:Cancion ;
-    mm:aptoParaAnimo mm:Alegre ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Willie Colón"^^xsd:string ;
-    mm:calificacion "3.0"^^xsd:float ;
-    mm:duracion "5:34"^^xsd:string ;
-    mm:perteneceAGenero mm:Salsa ;
-    mm:titulo "La Murga"^^xsd:string .
-
 mm:C_La_Negra_Tiene_Tumbao_Celia_Cruz a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -6102,15 +6039,6 @@ mm:C_La_Tierra_del_Olvido_Carlos_Vives a mm:Cancion ;
     mm:duracion "4:25"^^xsd:string ;
     mm:perteneceAGenero mm:Latin ;
     mm:titulo "La Tierra del Olvido"^^xsd:string .
-
-mm:C_La_Vida_Es_Un_Carnaval_Celia_Cruz a mm:Cancion ;
-    mm:aptoParaAnimo mm:Alegre ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Celia Cruz"^^xsd:string ;
-    mm:calificacion "3.7"^^xsd:float ;
-    mm:duracion "4:36"^^xsd:string ;
-    mm:perteneceAGenero mm:Salsa ;
-    mm:titulo "La Vida Es Un Carnaval"^^xsd:string .
 
 mm:C_La_tortura_Shakira a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
@@ -8227,15 +8155,6 @@ mm:C_Outside_feat_Ellie_Goulding_Calvin_Harris a mm:Cancion ;
     mm:perteneceAGenero mm:Electronic ;
     mm:titulo "Outside (feat. Ellie Goulding)"^^xsd:string .
 
-mm:C_Oye_Cómo_Va_Celia_Cruz a mm:Cancion ;
-    mm:aptoParaAnimo mm:Alegre ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Celia Cruz"^^xsd:string ;
-    mm:calificacion "3.2"^^xsd:float ;
-    mm:duracion "4:32"^^xsd:string ;
-    mm:perteneceAGenero mm:Salsa ;
-    mm:titulo "Oye Cómo Va"^^xsd:string .
-
 mm:C_PARANORMAL_Tainy a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -8316,15 +8235,6 @@ mm:C_PERREO_LLORANDO_Tokischa a mm:Cancion ;
     mm:duracion "3:08"^^xsd:string ;
     mm:perteneceAGenero mm:Reggaeton ;
     mm:titulo "PERREO LLORANDO"^^xsd:string .
-
-mm:C_PERRO_NEGRO_Bad_Bunny a mm:Cancion ;
-    mm:aptoParaAnimo mm:Energico ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Bad Bunny"^^xsd:string ;
-    mm:calificacion "3.7"^^xsd:float ;
-    mm:duracion "2:42"^^xsd:string ;
-    mm:perteneceAGenero mm:Reggaeton ;
-    mm:titulo "PERRO NEGRO"^^xsd:string .
 
 mm:C_PIENSO_EN_TI_Alvaro_Díaz a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
@@ -12133,15 +12043,6 @@ mm:C_Tiroteo_Remix_Marc_Segui a mm:Cancion ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "Tiroteo (Remix)"^^xsd:string .
 
-mm:C_Tití_Me_Preguntó_Bad_Bunny a mm:Cancion ;
-    mm:aptoParaAnimo mm:Energico ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Bad Bunny"^^xsd:string ;
-    mm:calificacion "4.9"^^xsd:float ;
-    mm:duracion "4:03"^^xsd:string ;
-    mm:perteneceAGenero mm:Urbano ;
-    mm:titulo "Tití Me Preguntó"^^xsd:string .
-
 mm:C_Toda_Remix_Alex_Rose a mm:Cancion ;
     mm:aptoParaAnimo mm:Romantico ;
     mm:aptoParaContexto mm:Casa ;
@@ -12618,15 +12519,6 @@ mm:C_VI_Soul_Nación_TRAP a mm:Cancion ;
     mm:duracion "1:51"^^xsd:string ;
     mm:perteneceAGenero mm:LoFi ;
     mm:titulo "VI Soul Nación"^^xsd:string .
-
-mm:C_VOY_A_LLeVARTE_PA_PR_Bad_Bunny a mm:Cancion ;
-    mm:aptoParaAnimo mm:Energico ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Bad Bunny"^^xsd:string ;
-    mm:calificacion "4.8"^^xsd:float ;
-    mm:duracion "2:36"^^xsd:string ;
-    mm:perteneceAGenero mm:Urbano ;
-    mm:titulo "VOY A LLeVARTE PA PR"^^xsd:string .
 
 mm:C_V_Soul_Nación_TRAP a mm:Cancion ;
     mm:aptoParaAnimo mm:Tranquilo ;
@@ -13365,15 +13257,6 @@ mm:C_Yes_Im_Changing_Tame_Impala a mm:Cancion ;
     mm:duracion "4:30"^^xsd:string ;
     mm:perteneceAGenero mm:Indie ;
     mm:titulo "Yes I'm Changing"^^xsd:string .
-
-mm:C_Yo_Perreo_Sola_Bad_Bunny a mm:Cancion ;
-    mm:aptoParaAnimo mm:Energico ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Bad Bunny"^^xsd:string ;
-    mm:calificacion "4.1"^^xsd:float ;
-    mm:duracion "2:52"^^xsd:string ;
-    mm:perteneceAGenero mm:Reggaeton ;
-    mm:titulo "Yo Perreo Sola"^^xsd:string .
 
 mm:C_Yo_También_feat_Marc_Anthony_Romeo_Santos a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
@@ -14124,11 +14007,24 @@ mm:C_寒意_放松的节拍 a mm:Cancion ;
 
 mm:usuario123 a mm:Usuario ;
     mm:email "dubanblanco123@gmail.com"^^xsd:string ;
-    mm:estaEnContexto mm:Estudio ;
+    mm:estaEnContexto mm:Descanso ;
     mm:leGusta mm:C_BAILE_INoLVIDABLE_Bad_Bunny,
-        mm:C_Si_Antes_Te_Hubiera_Conocido_KAROL_G ;
+        mm:C_Ché_Ché_Colé_Willie_Colón,
+        mm:C_Como_en_el_Idilio_Marc_Anthony,
+        mm:C_DtMF_Bad_Bunny,
+        mm:C_DÁKITI_Bad_Bunny,
+        mm:C_Hasta_Abajo_Don_Omar,
+        mm:C_LUNA_Feid,
+        mm:C_La_Murga_Willie_Colón,
+        mm:C_La_Vida_Es_Un_Carnaval_Celia_Cruz,
+        mm:C_Oye_Cómo_Va_Celia_Cruz,
+        mm:C_PERRO_NEGRO_Bad_Bunny,
+        mm:C_Si_Antes_Te_Hubiera_Conocido_KAROL_G,
+        mm:C_Tití_Me_Preguntó_Bad_Bunny,
+        mm:C_VOY_A_LLeVARTE_PA_PR_Bad_Bunny,
+        mm:C_Yo_Perreo_Sola_Bad_Bunny ;
     mm:nombre "Duban"^^xsd:string ;
-    mm:tieneEstadoDeAnimo mm:Triste .
+    mm:tieneEstadoDeAnimo mm:Melancolico .
 
 mm:C_BAILE_INoLVIDABLE_Bad_Bunny a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
@@ -14139,6 +14035,96 @@ mm:C_BAILE_INoLVIDABLE_Bad_Bunny a mm:Cancion ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "BAILE INoLVIDABLE"^^xsd:string .
 
+mm:C_Ché_Ché_Colé_Willie_Colón a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Willie Colón"^^xsd:string ;
+    mm:calificacion "2.9"^^xsd:float ;
+    mm:duracion "3:29"^^xsd:string ;
+    mm:perteneceAGenero mm:Salsa ;
+    mm:titulo "Ché Ché Colé"^^xsd:string .
+
+mm:C_Como_en_el_Idilio_Marc_Anthony a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Marc Anthony"^^xsd:string ;
+    mm:calificacion "3.2"^^xsd:float ;
+    mm:duracion "4:26"^^xsd:string ;
+    mm:perteneceAGenero mm:Salsa ;
+    mm:titulo "Como en el Idilio"^^xsd:string .
+
+mm:C_DtMF_Bad_Bunny a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Bad Bunny"^^xsd:string ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "3:57"^^xsd:string ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "DtMF"^^xsd:string .
+
+mm:C_DÁKITI_Bad_Bunny a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Bad Bunny"^^xsd:string ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "3:25"^^xsd:string ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "DÁKITI"^^xsd:string .
+
+mm:C_Hasta_Abajo_Don_Omar a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Don Omar"^^xsd:string ;
+    mm:calificacion "2.9"^^xsd:float ;
+    mm:duracion "3:53"^^xsd:string ;
+    mm:perteneceAGenero mm:Reggaeton ;
+    mm:titulo "Hasta Abajo"^^xsd:string .
+
+mm:C_LUNA_Feid a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Feid"^^xsd:string ;
+    mm:calificacion "3.8"^^xsd:float ;
+    mm:duracion "3:16"^^xsd:string ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "LUNA"^^xsd:string .
+
+mm:C_La_Murga_Willie_Colón a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Willie Colón"^^xsd:string ;
+    mm:calificacion "3.0"^^xsd:float ;
+    mm:duracion "5:34"^^xsd:string ;
+    mm:perteneceAGenero mm:Salsa ;
+    mm:titulo "La Murga"^^xsd:string .
+
+mm:C_La_Vida_Es_Un_Carnaval_Celia_Cruz a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Celia Cruz"^^xsd:string ;
+    mm:calificacion "3.7"^^xsd:float ;
+    mm:duracion "4:36"^^xsd:string ;
+    mm:perteneceAGenero mm:Salsa ;
+    mm:titulo "La Vida Es Un Carnaval"^^xsd:string .
+
+mm:C_Oye_Cómo_Va_Celia_Cruz a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Celia Cruz"^^xsd:string ;
+    mm:calificacion "3.2"^^xsd:float ;
+    mm:duracion "4:32"^^xsd:string ;
+    mm:perteneceAGenero mm:Salsa ;
+    mm:titulo "Oye Cómo Va"^^xsd:string .
+
+mm:C_PERRO_NEGRO_Bad_Bunny a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Bad Bunny"^^xsd:string ;
+    mm:calificacion "3.7"^^xsd:float ;
+    mm:duracion "2:42"^^xsd:string ;
+    mm:perteneceAGenero mm:Reggaeton ;
+    mm:titulo "PERRO NEGRO"^^xsd:string .
+
 mm:C_Si_Antes_Te_Hubiera_Conocido_KAROL_G a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -14147,6 +14133,33 @@ mm:C_Si_Antes_Te_Hubiera_Conocido_KAROL_G a mm:Cancion ;
     mm:duracion "3:15"^^xsd:string ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "Si Antes Te Hubiera Conocido"^^xsd:string .
+
+mm:C_Tití_Me_Preguntó_Bad_Bunny a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Bad Bunny"^^xsd:string ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "4:03"^^xsd:string ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Tití Me Preguntó"^^xsd:string .
+
+mm:C_VOY_A_LLeVARTE_PA_PR_Bad_Bunny a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Bad Bunny"^^xsd:string ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "2:36"^^xsd:string ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "VOY A LLeVARTE PA PR"^^xsd:string .
+
+mm:C_Yo_Perreo_Sola_Bad_Bunny a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Bad Bunny"^^xsd:string ;
+    mm:calificacion "4.1"^^xsd:float ;
+    mm:duracion "2:52"^^xsd:string ;
+    mm:perteneceAGenero mm:Reggaeton ;
+    mm:titulo "Yo Perreo Sola"^^xsd:string .
 
 mm:Latin a mm:Genero .
 

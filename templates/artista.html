@@ -230,6 +230,32 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .track-actions {
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .track-actions .btn-icon {
+      width: 30px;
+      height: 30px;
+      font-size: 0.85rem;
+      margin: 0 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .track-actions .btn-icon:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    .track-actions .btn-like.active-like { color: #f43f5e; border-color: #f43f5e; }
+    .track-actions .btn-dislike.active-dislike { color: var(--text-muted); border-color: var(--text-muted); }
+
     /* ── Back link ── */
     .back-link {
       display: inline-flex;
@@ -349,6 +375,7 @@
             <th>Contexto</th>
             <th class="th-center">Rating</th>
             <th class="th-center">Duración</th>
+            <th class="th-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -368,6 +395,12 @@
               <span class="stars">★</span> {{ "%.1f"|format(c.calificacion) }}
             </td>
             <td class="track-duration">{{ c.duracion }}</td>
+            <td class="track-actions">
+              <button class="btn-icon btn-like" title="Me gusta"
+                onclick="reaccionArtista('{{ c.id }}','like',this)">♥</button>
+              <button class="btn-icon btn-dislike" title="No me gusta"
+                onclick="reaccionArtista('{{ c.id }}','dislike',this)">✕</button>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -400,6 +433,29 @@
     </div>
   </div>
 
+
+  <script>
+  function reaccionArtista(cancionId, tipo, btn) {
+    const endpoint = tipo === 'like' ? '/me_gusta' : '/no_me_gusta';
+    const fd = new FormData();
+    fd.append('cancion_id', cancionId);
+    fetch(endpoint, { method: 'POST', body: fd })
+      .then(r => r.json())
+      .then(() => {
+        const row = btn.closest('tr');
+        if (tipo === 'like') {
+          btn.classList.add('active-like');
+          row.querySelector('.btn-dislike')?.classList.remove('active-dislike');
+          showToast('♥ Agregado a favoritos');
+        } else {
+          btn.classList.add('active-dislike');
+          row.querySelector('.btn-like')?.classList.remove('active-like');
+          showToast('✕ Canción excluida de recomendaciones');
+        }
+      })
+      .catch(() => showToast('Error al registrar reacción'));
+  }
+  </script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

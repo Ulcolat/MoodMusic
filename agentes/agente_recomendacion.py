@@ -21,6 +21,9 @@ ALL_GENRES = [
 
 
 class AgenteRecomendacion:
+    def _normalizar(self, texto):
+        return str(texto).strip().lower().replace("_", " ")
+
     """
     Agente que genera recomendaciones de canciones.
     
@@ -66,10 +69,8 @@ class AgenteRecomendacion:
         genero = str(genero_uri).split("#")[-1] if genero_uri else ""
         calificacion = float(g.value(cancion_uri, MM.calificacion) or 0)
         duracion = str(g.value(cancion_uri, MM.duracion) or "")
-        animo_uri = g.value(cancion_uri, MM.aptoParaAnimo)
-        animo = str(animo_uri).split("#")[-1] if animo_uri else ""
-        contexto_uri = g.value(cancion_uri, MM.aptoParaContexto)
-        contexto = str(contexto_uri).split("#")[-1] if contexto_uri else ""
+        animos = [str(x).split("#")[-1] for x in g.objects(cancion_uri, MM.aptoParaAnimo)]
+        contextos = [str(x).split("#")[-1] for x in g.objects(cancion_uri, MM.aptoParaContexto)]
         return {
             "id": local,
             "titulo": titulo,
@@ -77,8 +78,12 @@ class AgenteRecomendacion:
             "genero": genero,
             "calificacion": calificacion,
             "duracion": duracion,
-            "animo": animo,
-            "contexto": contexto,
+            "animos": animos,
+            "contextos": contextos,
+            # Valores singulares por defecto (el primero de la lista)
+            # recomendar() los sobreescribe con el valor que pidió el usuario
+            "animo": animos[0] if animos else "",
+            "contexto": contextos[0] if contextos else "",
         }
 
     # ──────────────────────────────────────────────
@@ -96,52 +101,85 @@ class AgenteRecomendacion:
         generos_rechazados: list = None,
         limite: int = 10,
     ) -> list:
+        """
+        Genera recomendaciones con fallback escalonado:
+          Nivel 1 — ánimo + contexto exactos          (score alto)
+          Nivel 2 — solo ánimo, sin contexto exacto   (score medio)
+          Nivel 3 — cualquier canción no excluida     (relleno si grafo muy pequeño)
+
+        Dentro de cada nivel se aplica scoring por preferencias del usuario.
+        Los géneros rechazados se excluyen completamente (no solo penalizan).
+        """
         g = self._grafo()
         excluidas = set(canciones_no_gustadas or [])
         favs_g = set(generos_favoritos or [])
         favs_a = set(artistas_favoritos or [])
         rech_g = set(generos_rechazados or [])
 
-        candidatos = []
+        def _score(c: dict, contexto_match: bool) -> float:
+            score = 0.0
+            if contexto_match:
+                score += 10.0          # contexto es PRIORITARIO, no solo +2
+            if c["genero"] in favs_g:
+                score += 4.0
+            if c["artista"] in favs_a:
+                score += 6.0
+            import random
+            score += c["calificacion"] * 0.5
+            score += random.uniform(0,1.5)
+            return score
+
+        nivel1, nivel2, nivel3 = [], [], []
+
         for cancion_uri in g.subjects(RDF.type, MM.Cancion):
             c = self._cancion_dict(g, cancion_uri)
 
-            # Filtro hard: excluir no gustadas
+            # Excluir canciones no gustadas
             if c["id"] in excluidas:
                 continue
 
-            # Filtro hard: sólo el estado de ánimo correcto
-            if c["animo"] != estado_animo:
+            # Excluir géneros rechazados completamente
+            if c["genero"] in rech_g:
                 continue
 
-            # Scoring
-            score = 0.0
+            animo_ok = estado_animo in c.get("animos", [])
+            ctx_ok = contexto in c.get("contextos", [])
 
-            # Contexto coincide
-            if c["contexto"] == contexto:
-                score += 2.0
+            if animo_ok and ctx_ok:
+                nivel1.append((_score(c, True), c))
+            elif animo_ok:
+                nivel2.append((_score(c, False), c))
+            else:
+                nivel3.append((_score(c, False), c))
 
-            # Género favorito
-            if c["genero"] in favs_g:
-                score += 2.0
+        for nivel in (nivel1, nivel2, nivel3):
+            nivel.sort(key=lambda x: x[0], reverse=True)
 
-            # Artista favorito
-            if c["artista"] in favs_a:
-                score += 3.0
+        # Armar resultado priorizando nivel1, luego nivel2, luego nivel3
+        # Inyectar animo/contexto singular que coincide con lo pedido (para la UI)
+        def _with_match(c, animo_val, ctx_val):
+            out = dict(c)
+            out["animo"] = animo_val
+            out["contexto"] = ctx_val
+            return out
 
-            # Género rechazado
-            if c["genero"] in rech_g:
-                score -= 5.0
+        resultado = []
+        for _, c in nivel1:
+            resultado.append(_with_match(c, estado_animo, contexto))
+            if len(resultado) >= limite:
+                return resultado
 
-            # Calificación como desempate
-            score += c["calificacion"] * 0.1
+        for _, c in nivel2:
+            resultado.append(_with_match(c, estado_animo, contexto))
+            if len(resultado) >= limite:
+                return resultado
 
-            candidatos.append((score, c))
+        for _, c in nivel3:
+            resultado.append(_with_match(c, estado_animo, contexto))
+            if len(resultado) >= limite:
+                return resultado
 
-        # Ordenar por score descendente
-        candidatos.sort(key=lambda x: x[0], reverse=True)
-
-        return [c for _, c in candidatos[:limite]]
+        return resultado
 
     # ──────────────────────────────────────────────
     # Recomendación por género
@@ -153,7 +191,7 @@ class AgenteRecomendacion:
         for cancion_uri in g.subjects(RDF.type, MM.Cancion):
             genero_uri = g.value(cancion_uri, MM.perteneceAGenero)
             genero_local = str(genero_uri).split("#")[-1] if genero_uri else ""
-            if genero_local == genero:
+            if self._normalizar(genero_local) == self._normalizar(genero):
                 c = self._cancion_dict(g, cancion_uri)
                 canciones.append(c)
         canciones.sort(key=lambda x: x["calificacion"], reverse=True)

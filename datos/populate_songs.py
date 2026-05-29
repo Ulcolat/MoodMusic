@@ -33,22 +33,89 @@ GENRE_MAP = {
     "Metal": "Metal",
 }
 
-# Reglas de inferencia: género -> (ánimos, contextos)
+# Reglas de inferencia: género -> lista de (ánimo, contexto) válidos
+# Cada par (ánimo, contexto) es una combinación legítima para ese género.
+# Una canción recibirá UNA combinación al poblar, pero el algoritmo de
+# recomendación tiene fallback escalonado para cubrir los huecos.
 GENRE_MOOD_CONTEXT = {
-    "Pop":        (["Alegre", "Romantico", "Energico"], ["Fiesta", "Casa", "Trabajo"]),
-    "HipHop":     (["Energico", "Estresado"], ["Ejercicio", "Trabajo", "Fiesta"]),
-    "Rock":       (["Energico", "Triste", "Estresado"], ["Ejercicio", "Casa", "Trabajo"]),
-    "Electronic": (["Energico", "Tranquilo"], ["Ejercicio", "Fiesta", "Trabajo"]),
-    "RnB":        (["Romantico", "Tranquilo", "Alegre"], ["Casa", "Fiesta", "Descanso"]),
-    "Jazz":       (["Tranquilo", "Romantico"], ["Casa", "Descanso", "Trabajo"]),
-    "Classical":  (["Tranquilo", "Estresado", "Triste"], ["Estudio", "Descanso", "Casa"]),
-    "Latin":      (["Alegre", "Romantico"], ["Fiesta", "Casa"]),
-    "Reggaeton":  (["Alegre", "Energico"], ["Fiesta", "Ejercicio"]),
-    "Urbano":     (["Tranquilo", "Romantico", "Alegre", "Triste"], ["Casa", "Fiesta", "Descanso"]),
-    "Indie":      (["Tranquilo", "Triste"], ["Estudio", "Casa", "Descanso"]),
-    "LoFi":       (["Tranquilo", "Estresado"], ["Estudio", "Trabajo", "Descanso"]),
-    "Salsa":      (["Alegre", "Energico"], ["Fiesta", "Casa"]),
-    "Metal":      (["Energico", "Estresado"], ["Ejercicio", "Trabajo"]),
+    "Pop":        [
+        ("Alegre","Fiesta"), ("Alegre","Casa"), ("Alegre","Trabajo"),
+        ("Romantico","Casa"), ("Romantico","Descanso"),
+        ("Energico","Ejercicio"), ("Energico","Trabajo"),
+        ("Triste","Casa"), ("Triste","Descanso"),
+        ("Tranquilo","Estudio"), ("Tranquilo","Casa"),
+    ],
+    "HipHop":     [
+        ("Energico","Ejercicio"), ("Energico","Trabajo"), ("Energico","Fiesta"),
+        ("Estresado","Casa"), ("Estresado","Descanso"),
+        ("Triste","Casa"), ("Triste","Descanso"),
+        ("Alegre","Fiesta"),
+    ],
+    "Rock":       [
+        ("Energico","Ejercicio"), ("Energico","Trabajo"),
+        ("Estresado","Ejercicio"), ("Estresado","Casa"),
+        ("Triste","Casa"), ("Triste","Descanso"),
+        ("Alegre","Fiesta"),
+    ],
+    "Electronic": [
+        ("Energico","Ejercicio"), ("Energico","Fiesta"), ("Energico","Trabajo"),
+        ("Tranquilo","Estudio"), ("Tranquilo","Descanso"),
+        ("Alegre","Fiesta"),
+    ],
+    "RnB":        [
+        ("Romantico","Casa"), ("Romantico","Descanso"), ("Romantico","Fiesta"),
+        ("Tranquilo","Casa"), ("Tranquilo","Descanso"), ("Tranquilo","Estudio"),
+        ("Alegre","Casa"), ("Alegre","Fiesta"),
+        ("Triste","Casa"), ("Triste","Descanso"),
+    ],
+    "Jazz":       [
+        ("Tranquilo","Casa"), ("Tranquilo","Descanso"), ("Tranquilo","Trabajo"), ("Tranquilo","Estudio"),
+        ("Romantico","Casa"), ("Romantico","Descanso"),
+        ("Estresado","Descanso"),
+        ("Triste","Casa"),
+    ],
+    "Classical":  [
+        ("Tranquilo","Estudio"), ("Tranquilo","Descanso"), ("Tranquilo","Casa"),
+        ("Estresado","Descanso"), ("Estresado","Estudio"),
+        ("Triste","Casa"), ("Triste","Descanso"), ("Triste","Estudio"),
+    ],
+    "Latin":      [
+        ("Alegre","Fiesta"), ("Alegre","Casa"),
+        ("Romantico","Casa"), ("Romantico","Fiesta"),
+        ("Energico","Fiesta"), ("Energico","Ejercicio"),
+    ],
+    "Reggaeton":  [
+        ("Alegre","Fiesta"), ("Alegre","Ejercicio"),
+        ("Energico","Fiesta"), ("Energico","Ejercicio"),
+        ("Tranquilo","Casa"), ("Romantico","Casa"),
+        ("Triste","Casa"),
+    ],
+    "Urbano":     [
+        ("Tranquilo","Casa"), ("Tranquilo","Descanso"),
+        ("Romantico","Casa"), ("Romantico","Descanso"),
+        ("Alegre","Fiesta"), ("Alegre","Casa"),
+        ("Triste","Casa"), ("Triste","Descanso"),
+        ("Estresado","Casa"),
+    ],
+    "Indie":      [
+        ("Tranquilo","Estudio"), ("Tranquilo","Casa"), ("Tranquilo","Descanso"),
+        ("Triste","Casa"), ("Triste","Descanso"), ("Triste","Estudio"),
+        ("Alegre","Casa"),
+    ],
+    "LoFi":       [
+        ("Tranquilo","Estudio"), ("Tranquilo","Trabajo"), ("Tranquilo","Descanso"),
+        ("Estresado","Estudio"), ("Estresado","Descanso"),
+        ("Triste","Estudio"),
+    ],
+    "Salsa":      [
+        ("Alegre","Fiesta"), ("Alegre","Casa"),
+        ("Energico","Fiesta"), ("Energico","Ejercicio"),
+        ("Romantico","Fiesta"),
+    ],
+    "Metal":      [
+        ("Energico","Ejercicio"), ("Energico","Trabajo"),
+        ("Estresado","Ejercicio"), ("Estresado","Casa"),
+    ],
 }
 
 # Búsquedas para obtener variedad de canciones
@@ -124,40 +191,54 @@ def map_genre(deezer_genre_name):
             return val
     return "Pop"
 
+# Contador global para distribuir las combinaciones de forma round-robin
+_combo_counter = {}
+
 def infer_mood_context(genre_mm, artist_name, track_name):
-    """Infiere estado de ánimo y contexto desde género y nombre de canción."""
+    """
+    Infiere estado de ánimo y contexto.
+    Primero intenta detectar palabras clave en el título.
+    Si no hay coincidencia, distribuye en round-robin sobre todas las
+    combinaciones válidas del género para garantizar cobertura uniforme.
+    """
     import random
-    moods, contexts = GENRE_MOOD_CONTEXT.get(genre_mm, (["Alegre"], ["Casa"]))
-    
+    pairs = GENRE_MOOD_CONTEXT.get(genre_mm, [("Alegre", "Casa")])
+
     title_lower = track_name.lower()
-    artist_lower = artist_name.lower()
-    
-    # Palabras clave para afinar ánimo
-    sad_words = ["sad", "cry", "tear", "alone", "hurt", "pain", "triste", "lloro", "dolor", "sin ti"]
-    happy_words = ["happy", "joy", "feliz", "alegr", "party", "fiesta", "celebrate"]
-    calm_words = ["chill", "relax", "sleep", "dream", "sueño", "calma", "tranquil", "night", "noche"]
-    energetic_words = ["power", "run", "fire", "go", "push", "fuerza", "energia", "beast"]
-    romantic_words = ["love", "heart", "kiss", "amor", "corazon", "beso", "romance", "together"]
-    stress_words = ["stress", "anxiety", "worry", "breath", "breathe"]
-    
-    for w in sad_words:
-        if w in title_lower:
-            return random.choice(["Triste"]), random.choice(["Casa", "Descanso"])
-    for w in happy_words:
-        if w in title_lower:
-            return random.choice(["Alegre"]), random.choice(["Fiesta", "Casa"])
-    for w in calm_words:
-        if w in title_lower:
-            return random.choice(["Tranquilo"]), random.choice(["Descanso", "Estudio"])
-    for w in energetic_words:
-        if w in title_lower:
-            return random.choice(["Energico"]), random.choice(["Ejercicio", "Trabajo"])
-    for w in romantic_words:
-        if w in title_lower:
-            return random.choice(["Romantico"]), random.choice(["Casa", "Descanso"])
-    for w in stress_words:
-        if w in title_lower:
-            return random.choice(["Estresado"]), random.choice(["Descanso", "Casa"])
+
+    # Palabras clave -> pares preferidos
+    keyword_pairs = [
+        (["sad","cry","tear","alone","hurt","pain","triste","lloro","dolor","sin ti"],
+         [p for p in pairs if p[0] == "Triste"] or [("Triste","Casa")]),
+        (["happy","joy","feliz","alegr","party","fiesta","celebrate"],
+         [p for p in pairs if p[0] == "Alegre"] or [("Alegre","Fiesta")]),
+        (["chill","relax","sleep","dream","sueño","calma","tranquil","night","noche","lofi","lo-fi"],
+         [p for p in pairs if p[0] == "Tranquilo"] or [("Tranquilo","Descanso")]),
+        (["power","run","fire","push","fuerza","energia","beast","hype"],
+         [p for p in pairs if p[0] == "Energico"] or [("Energico","Ejercicio")]),
+        (["love","heart","kiss","amor","corazon","beso","romance","together","darling"],
+         [p for p in pairs if p[0] == "Romantico"] or [("Romantico","Casa")]),
+        (["stress","anxiety","worry","breath","overwhelm"],
+         [p for p in pairs if p[0] == "Estresado"] or [("Estresado","Descanso")]),
+        (["study","estudia","focus","concentr","work","trabaj","office"],
+         [p for p in pairs if p[1] in ("Estudio","Trabajo")] or [pairs[0]]),
+        (["gym","workout","ejercicio","training","run","corr"],
+         [p for p in pairs if p[1] == "Ejercicio"] or [pairs[0]]),
+        (["party","fiesta","dance","bailar","club"],
+         [p for p in pairs if p[1] == "Fiesta"] or [pairs[0]]),
+    ]
+
+    for keywords, candidates in keyword_pairs:
+        if any(w in title_lower for w in keywords):
+            chosen = random.choice(candidates)
+            return chosen[0], chosen[1]
+
+    # Round-robin para cubrir todas las combinaciones del género
+    global _combo_counter
+    idx = _combo_counter.get(genre_mm, 0)
+    chosen = pairs[idx % len(pairs)]
+    _combo_counter[genre_mm] = idx + 1
+    return chosen[0], chosen[1]
     
     return random.choice(moods), random.choice(contexts)
 
@@ -260,9 +341,16 @@ def main():
         next_num += 1
         genres_used.add(song["genre"])
         
+        semantic_pairs = GENRE_MOOD_CONTEXT.get(song["genre"], [(song["mood"], song["context"])])
+        moods = list(set([m for m,c in semantic_pairs]))
+        contexts = list(set([c for m,c in semantic_pairs]))
+
+        mood_lines = " ;\n    ".join([f"mm:aptoParaAnimo mm:{m}" for m in moods[:3]])
+        context_lines = " ;\n    ".join([f"mm:aptoParaContexto mm:{c}" for c in contexts[:3]])
+
         part = f"""{cancion_id} a mm:Cancion ;
-    mm:aptoParaAnimo mm:{song["mood"]} ;
-    mm:aptoParaContexto mm:{song["context"]} ;
+    {mood_lines} ;
+    {context_lines} ;
     mm:artista "{artist_safe}" ;
     mm:calificacion "{song["rating"]}"^^xsd:float ;
     mm:duracion "{song["duration"]}" ;

@@ -6,8 +6,8 @@
       <div class="song-artist">{{ c.artista }}</div>
       <div class="song-tags">
         <span class="tag tag-genre">{{ c.genero }}</span>
-        <span class="tag tag-mood">{{ c.animo }}</span>
-        <span class="tag tag-ctx">{{ c.contexto }}</span>
+        {% if c.animo and c.animo != 'None' %}<span class="tag tag-mood">{{ c.animo }}</span>{% endif %}
+        {% if c.contexto and c.contexto != 'None' %}<span class="tag tag-ctx">{{ c.contexto }}</span>{% endif %}
       </div>
     </div>
   </div>
