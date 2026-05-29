@@ -1,180 +1,129 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoodMusic — Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoodMusic – Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-
-    <!-- ==================== FONDO ANIMADO ==================== -->
-    <div class="bg-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <svg class="nav-logo" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" fill="rgba(124,58,237,0.3)"/>
+        <path d="M14 28V13l16 7.5L14 28z" fill="#a78bfa"/>
+      </svg>
+      MoodMusic
     </div>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard') }}" class="nav-link active">Dashboard</a>
+      <a href="{{ url_for('perfil') }}" class="nav-link">Mi Perfil</a>
+      <a href="{{ url_for('logout') }}" class="nav-link nav-logout">Salir</a>
+    </div>
+  </nav>
 
-    <!-- ==================== NAVBAR ==================== -->
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <span class="logo-icon-sm">♪</span>
-            <span class="navbar-title">MoodMusic</span>
+  <div class="page-container">
+
+    <!-- HEADER -->
+    <header class="page-header">
+      <div>
+        <h1>Hola, <span class="accent">{{ nombre }}</span> 👋</h1>
+        <p class="subtext">¿Cómo te sientes hoy? Cuéntanos y te recomendamos música.</p>
+      </div>
+      {% if perfil.estado_animo %}
+      <div class="current-mood-badge">
+        <span>{{ perfil.estado_animo }}</span> · <span>{{ perfil.contexto }}</span>
+      </div>
+      {% endif %}
+    </header>
+
+    <!-- FORM RECOMENDACIÓN -->
+    <section class="card mood-form-card">
+      <h2 class="card-title">Obtener recomendaciones</h2>
+      <form id="formRecomendar" class="mood-form">
+        <div class="form-row">
+          <div class="select-group">
+            <label>¿Cómo te sientes?</label>
+            <select name="estado_animo" id="selAnimo" required>
+              <option value="">— Estado de ánimo —</option>
+              {% for e in estados_animo %}
+              <option value="{{ e }}" {% if perfil.estado_animo == e %}selected{% endif %}>{{ e }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="select-group">
+            <label>¿Qué estás haciendo?</label>
+            <select name="contexto" id="selContexto" required>
+              <option value="">— Contexto —</option>
+              {% for c in contextos %}
+              <option value="{{ c }}" {% if perfil.contexto == c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn-primary" id="btnRecomendar">
+            <span id="btnText">🎵 Recomendar</span>
+          </button>
         </div>
-        <div class="navbar-links">
-            <a href="{{ url_for('dashboard') }}" class="nav-link active">Dashboard</a>
-            <a href="{{ url_for('perfil') }}" class="nav-link">Mi perfil</a>
-            <a href="{{ url_for('logout') }}" class="nav-link nav-link-logout">Salir</a>
-        </div>
-    </nav>
+      </form>
+    </section>
 
-    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
-    <main class="main-content">
+    <!-- RECOMENDACIONES -->
+    <section id="secRecomendaciones" class="{% if not recomendaciones %}hidden{% endif %}">
+      <h2 class="section-title">🎯 Recomendaciones para ti</h2>
+      {% if perfil.generos_favoritos %}
+      <p class="personaliz-note">Personalizadas según tus géneros favoritos: {{ perfil.generos_favoritos | join(', ') }}</p>
+      {% endif %}
+      <div class="song-grid" id="gridRecomendadas">
+        {% for c in recomendaciones %}
+        {% include 'partials/_song_card.html' %}
+        {% endfor %}
+      </div>
+    </section>
 
-        <!-- Saludo -->
-        <section class="section-greeting">
-            <h2 class="greeting-title">Hola, <span class="highlight">{{ nombre }}</span> 👋</h2>
-            <p class="greeting-subtitle">¿Cómo te sientes hoy? Cuéntanos y encontramos tu música.</p>
-        </section>
+    <!-- MEJOR VALORADAS -->
+    <section>
+      <h2 class="section-title">⭐ Mejor valoradas</h2>
+      <div class="song-grid">
+        {% for c in mejor_valoradas %}
+        {% with cancion=c %}{% include 'partials/_song_card_simple.html' %}{% endwith %}
+        {% endfor %}
+      </div>
+    </section>
 
-        <!-- ==================== SELECTOR DE ESTADO DE ÁNIMO ==================== -->
-        <section class="section-card">
-            <h3 class="section-title">¿Cómo estás ahora?</h3>
+    <!-- EXPLORAR POR GÉNERO -->
+    <section>
+      <h2 class="section-title">🎸 Explorar por género</h2>
+      <div class="genre-tabs" id="genreTabs">
+        {% for g in generos %}
+        <button class="genre-tab" data-genre="{{ g }}">{{ g }}</button>
+        {% endfor %}
+      </div>
+      <div class="song-grid" id="gridGenero"></div>
+    </section>
 
-            <form id="form-recomendar">
+  </div>
 
-                <!-- Estado de ánimo -->
-                <div class="form-group">
-                    <label class="form-label">Estado de ánimo</label>
-                    <div class="chips-container">
-                        {% for estado in estados_animo %}
-                        <button
-                            type="button"
-                            class="chip {% if perfil.estado_animo == estado %}chip-active{% endif %}"
-                            data-tipo="estado_animo"
-                            data-valor="{{ estado }}">
-                            {{ estado }}
-                        </button>
-                        {% endfor %}
-                    </div>
-                    <input type="hidden" id="estado_animo" name="estado_animo"
-                        value="{{ perfil.estado_animo or '' }}">
-                </div>
+  <!-- PLAYER GLOBAL -->
+  <div id="player" class="player hidden">
+    <div class="player-info">
+      <div class="player-title" id="playerTitle">—</div>
+      <div class="player-artist" id="playerArtist">—</div>
+    </div>
+    <div class="player-controls">
+      <audio id="audioEl" preload="none"></audio>
+      <button id="btnPlay" class="btn-play" onclick="togglePlay()">▶</button>
+      <div class="progress-wrap">
+        <span id="timeCurrent">0:00</span>
+        <input type="range" id="progressBar" value="0" min="0" max="30" step="0.1" oninput="seekAudio(this.value)">
+        <span id="timeTotal">0:30</span>
+      </div>
+      <button class="btn-close-player" onclick="closePlayer()">✕</button>
+    </div>
+  </div>
 
-                <!-- Contexto -->
-                <div class="form-group">
-                    <label class="form-label">Contexto</label>
-                    <div class="chips-container">
-                        {% for contexto in contextos %}
-                        <button
-                            type="button"
-                            class="chip {% if perfil.contexto == contexto %}chip-active{% endif %}"
-                            data-tipo="contexto"
-                            data-valor="{{ contexto }}">
-                            {{ contexto }}
-                        </button>
-                        {% endfor %}
-                    </div>
-                    <input type="hidden" id="contexto" name="contexto"
-                        value="{{ perfil.contexto or '' }}">
-                </div>
-
-                <button class="btn btn-primary" type="submit" id="btn-recomendar">
-                    <span>Recomendar música</span>
-                    <span class="btn-icon">✦</span>
-                </button>
-
-            </form>
-        </section>
-
-        <!-- ==================== RECOMENDACIONES ==================== -->
-        <section class="section-card" id="seccion-recomendaciones">
-            <h3 class="section-title">
-                Recomendaciones para ti
-                {% if perfil.estado_animo and perfil.contexto %}
-                <span class="badge">{{ perfil.estado_animo }} · {{ perfil.contexto }}</span>
-                {% endif %}
-            </h3>
-
-            <div class="canciones-grid" id="grid-recomendaciones">
-                {% if recomendaciones %}
-                    {% for cancion in recomendaciones %}
-                    <div class="cancion-card">
-                        <div class="cancion-info">
-                            <span class="cancion-titulo">{{ cancion.titulo }}</span>
-                            <span class="cancion-artista">{{ cancion.artista }}</span>
-                            <div class="cancion-meta">
-                                <span class="tag">{{ cancion.genero }}</span>
-                                <span class="cancion-duracion">{{ cancion.duracion }}</span>
-                                <span class="cancion-calificacion">★ {{ cancion.calificacion }}</span>
-                            </div>
-                        </div>
-                        <div class="cancion-acciones">
-                            <button
-                                class="btn-accion btn-gusta"
-                                data-cancion="{{ cancion.id }}"
-                                title="Me gusta">
-                                ♥
-                            </button>
-                            <button
-                                class="btn-accion btn-no-gusta"
-                                data-cancion="{{ cancion.id }}"
-                                title="No me gusta">
-                                ✕
-                            </button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="empty-state">Selecciona tu estado de ánimo y contexto para recibir recomendaciones.</p>
-                {% endif %}
-            </div>
-        </section>
-
-        <!-- ==================== MEJOR VALORADAS ==================== -->
-        <section class="section-card">
-            <h3 class="section-title">Mejor valoradas</h3>
-            <div class="canciones-grid">
-                {% for cancion in mejor_valoradas %}
-                <div class="cancion-card">
-                    <div class="cancion-info">
-                        <span class="cancion-titulo">{{ cancion.titulo }}</span>
-                        <span class="cancion-artista">{{ cancion.artista }}</span>
-                        <div class="cancion-meta">
-                            <span class="tag">{{ cancion.genero }}</span>
-                            <span class="cancion-duracion">{{ cancion.duracion }}</span>
-                            <span class="cancion-calificacion">★ {{ cancion.calificacion }}</span>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-
-        <!-- ==================== EXPLORAR POR GÉNERO ==================== -->
-        <section class="section-card">
-            <h3 class="section-title">Explorar por género</h3>
-            <div class="chips-container">
-                {% for genero in generos %}
-                <button
-                    class="chip chip-genero"
-                    data-genero="{{ genero }}">
-                    {{ genero }}
-                </button>
-                {% endfor %}
-            </div>
-            <div class="canciones-grid" id="grid-genero">
-                <p class="empty-state">Selecciona un género para explorar.</p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ==================== TOAST NOTIFICACIÓN ==================== -->
-    <div class="toast" id="toast"></div>
-
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

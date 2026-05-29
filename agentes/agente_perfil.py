@@ -1,240 +1,153 @@
 # ==================== AGENTE DE PERFIL DE USUARIO ====================
-# Responsabilidad: recolectar, registrar y actualizar la información
-# del usuario (estado de ánimo, contexto, gustos y disgustos) en el grafo RDF.
+# Responsabilidad: gestionar perfiles de usuario en el grafo RDF.
+# Mejorado: tracking de géneros y artistas favoritos para personalización.
 
-from rdflib import Graph, Namespace, URIRef, Literal
+from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, XSD
 import os
-
-# ==================== CONFIGURACIÓN ====================
+import threading
 
 MM = Namespace("http://www.semanticweb.org/moodmusic#")
-RUTA_GRAFO = os.path.join(os.path.dirname(__file__), "..", "datos", "grafo.ttl")
 
+# Ruta al grafo principal
+GRAFO_PATH = os.path.join(os.path.dirname(__file__), "..", "datos", "grafo.ttl")
 
-# ==================== CLASE PRINCIPAL ====================
+# Lock para evitar escrituras concurrentes
+_lock = threading.Lock()
+
 
 class AgentePerfilUsuario:
     """
-    Agente encargado de mantener actualizado el perfil
-    de cada usuario dentro del grafo RDF de MoodMusic.
+    Agente que gestiona el perfil del usuario en el grafo RDF.
+    
+    Mantiene:
+    - Estado de ánimo actual y contexto
+    - Canciones gustadas y no gustadas
+    - Géneros y artistas favoritos (inferidos de gustos)
+    - Géneros y artistas rechazados
     """
 
     def __init__(self):
-        self.grafo = Graph()
-        self.grafo.bind("mm", MM)
-        self._cargar_grafo()
+        self.grafo_path = GRAFO_PATH
 
-    # ==================== CARGA Y GUARDADO ====================
+    # ──────────────────────────────────────────────
+    # Carga y guardado
+    # ──────────────────────────────────────────────
 
     def _cargar_grafo(self):
-        """Carga el grafo RDF desde el archivo .ttl."""
-        if os.path.exists(RUTA_GRAFO):
-            self.grafo.parse(RUTA_GRAFO, format="turtle")
+        g = Graph()
+        if os.path.exists(self.grafo_path):
+            g.parse(self.grafo_path, format="turtle")
+        return g
 
-    def _guardar_grafo(self):
-        """Guarda el estado actual del grafo en el archivo .ttl."""
-        self.grafo.serialize(destination=RUTA_GRAFO, format="turtle")
+    def _guardar_grafo(self, g):
+        with _lock:
+            g.serialize(destination=self.grafo_path, format="turtle")
 
-    # ==================== GESTIÓN DE USUARIOS ====================
+    # ──────────────────────────────────────────────
+    # Gestión de usuarios
+    # ──────────────────────────────────────────────
 
-    def registrar_usuario(self, usuario_id, nombre, email):
-        """
-        Registra un nuevo usuario en el grafo RDF.
+    def usuario_existe(self, usuario_id: str) -> bool:
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
+        return (u, RDF.type, MM.Usuario) in g
 
-        Args:
-            usuario_id (str): Identificador único del usuario. Ej: 'Usuario1'
-            nombre (str): Nombre del usuario.
-            email (str): Correo electrónico del usuario.
-        """
-        usuario = MM[usuario_id]
+    def registrar_usuario(self, usuario_id: str, nombre: str, email: str):
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
+        g.add((u, RDF.type, MM.Usuario))
+        g.add((u, MM.nombre, Literal(nombre, datatype=XSD.string)))
+        g.add((u, MM.email, Literal(email, datatype=XSD.string)))
+        self._guardar_grafo(g)
 
-        # Evitar duplicados
-        if (usuario, RDF.type, MM.Usuario) in self.grafo:
-            return
+    def obtener_perfil(self, usuario_id: str) -> dict:
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
 
-        self.grafo.add((usuario, RDF.type, MM.Usuario))
-        self.grafo.add((usuario, MM.nombre, Literal(nombre, datatype=XSD.string)))
-        self.grafo.add((usuario, MM.email, Literal(email, datatype=XSD.string)))
-        self._guardar_grafo()
+        nombre = str(g.value(u, MM.nombre) or "")
+        email = str(g.value(u, MM.email) or "")
+        estado_animo = self._local(g.value(u, MM.tieneEstadoDeAnimo))
+        contexto = self._local(g.value(u, MM.estaEnContexto))
 
-    def usuario_existe(self, usuario_id):
-        """
-        Verifica si un usuario ya está registrado en el grafo.
+        canciones_gustadas = [
+            self._local(c) for c in g.objects(u, MM.leGusta)
+        ]
+        canciones_no_gustadas = [
+            self._local(c) for c in g.objects(u, MM.noLeGusta)
+        ]
 
-        Args:
-            usuario_id (str): Identificador del usuario.
+        # Géneros favoritos (inferidos de canciones gustadas)
+        generos_favoritos = list(
+            {self._local(g.value(MM[c], MM.perteneceAGenero)) for c in canciones_gustadas
+             if g.value(MM[c], MM.perteneceAGenero)}
+        )
+        # Artistas favoritos
+        artistas_favoritos = list(
+            {str(g.value(MM[c], MM.artista) or "") for c in canciones_gustadas
+             if g.value(MM[c], MM.artista)}
+        )
+        # Géneros rechazados
+        generos_rechazados = list(
+            {self._local(g.value(MM[c], MM.perteneceAGenero)) for c in canciones_no_gustadas
+             if g.value(MM[c], MM.perteneceAGenero)}
+        )
 
-        Returns:
-            bool: True si existe, False si no.
-        """
-        usuario = MM[usuario_id]
-        return (usuario, RDF.type, MM.Usuario) in self.grafo
-
-    # ==================== ESTADO DE ÁNIMO ====================
-
-    def actualizar_estado_animo(self, usuario_id, estado):
-        """
-        Actualiza el estado de ánimo actual del usuario en el grafo.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
-            estado (str): Estado de ánimo. Ej: 'Alegre', 'Triste', 'Tranquilo'.
-        """
-        usuario = MM[usuario_id]
-        estado_uri = MM[estado]
-
-        # Eliminar estado de ánimo anterior si existe
-        self.grafo.remove((usuario, MM.tieneEstadoDeAnimo, None))
-
-        # Registrar nuevo estado de ánimo
-        self.grafo.add((usuario, MM.tieneEstadoDeAnimo, estado_uri))
-        self._guardar_grafo()
-
-    def obtener_estado_animo(self, usuario_id):
-        """
-        Obtiene el estado de ánimo actual del usuario.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
-
-        Returns:
-            str | None: Nombre del estado de ánimo o None si no tiene.
-        """
-        usuario = MM[usuario_id]
-        for _, _, estado in self.grafo.triples((usuario, MM.tieneEstadoDeAnimo, None)):
-            return str(estado).split("#")[-1]
-        return None
-
-    # ==================== CONTEXTO ====================
-
-    def actualizar_contexto(self, usuario_id, contexto):
-        """
-        Actualiza el contexto actual del usuario en el grafo.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
-            contexto (str): Contexto. Ej: 'Estudio', 'Ejercicio', 'Casa'.
-        """
-        usuario = MM[usuario_id]
-        contexto_uri = MM[contexto]
-
-        # Eliminar contexto anterior si existe
-        self.grafo.remove((usuario, MM.estaEnContexto, None))
-
-        # Registrar nuevo contexto
-        self.grafo.add((usuario, MM.estaEnContexto, contexto_uri))
-        self._guardar_grafo()
-
-    def obtener_contexto(self, usuario_id):
-        """
-        Obtiene el contexto actual del usuario.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
-
-        Returns:
-            str | None: Nombre del contexto o None si no tiene.
-        """
-        usuario = MM[usuario_id]
-        for _, _, contexto in self.grafo.triples((usuario, MM.estaEnContexto, None)):
-            return str(contexto).split("#")[-1]
-        return None
-
-    # ==================== GUSTOS Y DISGUSTOS ====================
-
-    def agregar_cancion_gustada(self, usuario_id, cancion_id):
-        """
-        Registra que al usuario le gusta una canción.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
-            cancion_id (str): Identificador de la canción. Ej: 'Cancion1'.
-        """
-        usuario = MM[usuario_id]
-        cancion = MM[cancion_id]
-
-        # Si estaba en no le gusta, eliminarla de ahí
-        self.grafo.remove((usuario, MM.noLeGusta, cancion))
-
-        # Agregar a le gusta si no estaba ya
-        if (usuario, MM.leGusta, cancion) not in self.grafo:
-            self.grafo.add((usuario, MM.leGusta, cancion))
-            self._guardar_grafo()
-
-    def agregar_cancion_no_gustada(self, usuario_id, cancion_id):
-        """
-        Registra que al usuario no le gusta una canción.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
-            cancion_id (str): Identificador de la canción. Ej: 'Cancion1'.
-        """
-        usuario = MM[usuario_id]
-        cancion = MM[cancion_id]
-
-        # Si estaba en le gusta, eliminarla de ahí
-        self.grafo.remove((usuario, MM.leGusta, cancion))
-
-        # Agregar a no le gusta si no estaba ya
-        if (usuario, MM.noLeGusta, cancion) not in self.grafo:
-            self.grafo.add((usuario, MM.noLeGusta, cancion))
-            self._guardar_grafo()
-
-    def obtener_canciones_gustadas(self, usuario_id):
-        """
-        Obtiene la lista de canciones que le gustan al usuario
-        con su título y artista reales.
-
-        Returns:
-            list: Lista de diccionarios con id, titulo y artista.
-        """
-        usuario = MM[usuario_id]
-        canciones = []
-        for _, _, cancion in self.grafo.triples((usuario, MM.leGusta, None)):
-            cancion_id = str(cancion).split("#")[-1]
-            titulo = self.grafo.value(cancion, MM.titulo) or cancion_id
-            artista = self.grafo.value(cancion, MM.artista) or ""
-            canciones.append({
-                "id": cancion_id,
-                "titulo": str(titulo),
-                "artista": str(artista),
-            })
-        return canciones
-
-    def obtener_canciones_no_gustadas(self, usuario_id):
-        """
-        Obtiene la lista de canciones descartadas por el usuario
-        con su título y artista reales.
-
-        Returns:
-            list: Lista de diccionarios con id, titulo y artista.
-        """
-        usuario = MM[usuario_id]
-        canciones = []
-        for _, _, cancion in self.grafo.triples((usuario, MM.noLeGusta, None)):
-            cancion_id = str(cancion).split("#")[-1]
-            titulo = self.grafo.value(cancion, MM.titulo) or cancion_id
-            artista = self.grafo.value(cancion, MM.artista) or ""
-            canciones.append({
-                "id": cancion_id,
-                "titulo": str(titulo),
-                "artista": str(artista),
-            })
-        return canciones
-    # ==================== PERFIL COMPLETO ====================
-
-    def obtener_perfil(self, usuario_id):
-        """
-        Retorna el perfil completo del usuario.
-
-        Returns:
-            dict: Diccionario con toda la información del perfil.
-        """
         return {
             "usuario_id": usuario_id,
-            "estado_animo": self.obtener_estado_animo(usuario_id),
-            "contexto": self.obtener_contexto(usuario_id),
-            "canciones_gustadas": self.obtener_canciones_gustadas(usuario_id),
-            "canciones_no_gustadas": self.obtener_canciones_no_gustadas(usuario_id),
+            "nombre": nombre,
+            "email": email,
+            "estado_animo": estado_animo,
+            "contexto": contexto,
+            "canciones_gustadas": canciones_gustadas,
+            "canciones_no_gustadas": canciones_no_gustadas,
+            "generos_favoritos": [g for g in generos_favoritos if g],
+            "artistas_favoritos": [a for a in artistas_favoritos if a],
+            "generos_rechazados": [g for g in generos_rechazados if g],
         }
+
+    def actualizar_estado_animo(self, usuario_id: str, estado_animo: str):
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
+        g.remove((u, MM.tieneEstadoDeAnimo, None))
+        g.add((u, MM.tieneEstadoDeAnimo, MM[estado_animo]))
+        self._guardar_grafo(g)
+
+    def actualizar_contexto(self, usuario_id: str, contexto: str):
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
+        g.remove((u, MM.estaEnContexto, None))
+        g.add((u, MM.estaEnContexto, MM[contexto]))
+        self._guardar_grafo(g)
+
+    def agregar_cancion_gustada(self, usuario_id: str, cancion_id: str):
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
+        c = MM[cancion_id]
+        # Quitar de no_gustadas si estaba
+        g.remove((u, MM.noLeGusta, c))
+        if (u, MM.leGusta, c) not in g:
+            g.add((u, MM.leGusta, c))
+        self._guardar_grafo(g)
+
+    def agregar_cancion_no_gustada(self, usuario_id: str, cancion_id: str):
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
+        c = MM[cancion_id]
+        # Quitar de gustadas si estaba
+        g.remove((u, MM.leGusta, c))
+        if (u, MM.noLeGusta, c) not in g:
+            g.add((u, MM.noLeGusta, c))
+        self._guardar_grafo(g)
+
+    # ──────────────────────────────────────────────
+    # Utilidades
+    # ──────────────────────────────────────────────
+
+    @staticmethod
+    def _local(uri):
+        """Extrae la parte local de una URI o retorna '' si es None."""
+        if uri is None:
+            return ""
+        s = str(uri)
+        return s.split("#")[-1] if "#" in s else s.split("/")[-1]

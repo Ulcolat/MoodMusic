@@ -1,117 +1,136 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoodMusic — Mi perfil</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoodMusic – Mi Perfil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
-
 <body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <svg class="nav-logo" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" fill="rgba(124,58,237,0.3)"/>
+        <path d="M14 28V13l16 7.5L14 28z" fill="#a78bfa"/>
+      </svg>
+      MoodMusic
+    </div>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+      <a href="{{ url_for('perfil') }}" class="nav-link active">Mi Perfil</a>
+      <a href="{{ url_for('logout') }}" class="nav-link nav-logout">Salir</a>
+    </div>
+  </nav>
 
-    <!-- ==================== FONDO ANIMADO ==================== -->
-    <div class="bg-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+  <div class="page-container">
+    <header class="page-header">
+      <div>
+        <h1>Mi <span class="accent">Perfil</span></h1>
+        <p class="subtext">Historial de gustos y estadísticas personalizadas.</p>
+      </div>
+    </header>
+
+    <div class="profile-grid">
+
+      <!-- Info básica -->
+      <div class="card profile-card">
+        <div class="profile-avatar">{{ nombre[0].upper() if nombre else "?" }}</div>
+        <h3 class="profile-name">{{ nombre }}</h3>
+        <p class="profile-email">{{ perfil.email }}</p>
+        <div class="profile-mood-ctx">
+          {% if perfil.estado_animo %}
+          <span class="tag tag-mood">{{ perfil.estado_animo }}</span>
+          {% endif %}
+          {% if perfil.contexto %}
+          <span class="tag tag-ctx">{{ perfil.contexto }}</span>
+          {% endif %}
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn-primary btn-block">← Volver al Dashboard</a>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="card">
+        <h2 class="card-title">Estadísticas</h2>
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num">{{ perfil.canciones_gustadas | length }}</div>
+            <div class="stat-label">Favoritas</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">{{ perfil.canciones_no_gustadas | length }}</div>
+            <div class="stat-label">No me gustan</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">{{ perfil.generos_favoritos | length }}</div>
+            <div class="stat-label">Géneros fav.</div>
+          </div>
+        </div>
+
+        {% if perfil.generos_favoritos %}
+        <h4 class="mini-title">Géneros favoritos</h4>
+        <div class="tag-list">
+          {% for g in perfil.generos_favoritos %}
+          <span class="tag tag-genre">{{ g }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if perfil.artistas_favoritos %}
+        <h4 class="mini-title">Artistas favoritos</h4>
+        <div class="tag-list">
+          {% for a in perfil.artistas_favoritos %}
+          <span class="tag tag-artist">{{ a }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if perfil.generos_rechazados %}
+        <h4 class="mini-title">Géneros que no te gustan</h4>
+        <div class="tag-list">
+          {% for g in perfil.generos_rechazados %}
+          <span class="tag tag-dislike">{{ g }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
     </div>
 
-    <!-- ==================== NAVBAR ==================== -->
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <span class="logo-icon-sm">♪</span>
-            <span class="navbar-title">MoodMusic</span>
-        </div>
-        <div class="navbar-links">
-            <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
-            <a href="{{ url_for('perfil') }}" class="nav-link active">Mi perfil</a>
-            <a href="{{ url_for('logout') }}" class="nav-link nav-link-logout">Salir</a>
-        </div>
-    </nav>
+    <!-- Explorar desde el perfil también -->
+    {% if generos %}
+    <section>
+      <h2 class="section-title">🎸 Explorar por género</h2>
+      <div class="genre-tabs" id="genreTabs">
+        {% for g in generos %}
+        <button class="genre-tab" data-genre="{{ g }}">{{ g }}</button>
+        {% endfor %}
+      </div>
+      <div class="song-grid" id="gridGenero"></div>
+    </section>
+    {% endif %}
 
-    <!-- ==================== CONTENIDO ==================== -->
-    <main class="main-content">
+  </div>
 
-        <section class="section-greeting">
-            <h2 class="greeting-title">Mi <span class="highlight">perfil</span></h2>
-            <p class="greeting-subtitle">Tu información guardada en el sistema.</p>
-        </section>
+  <!-- PLAYER GLOBAL (mismo que en dashboard) -->
+  <div id="player" class="player hidden">
+    <div class="player-info">
+      <div class="player-title" id="playerTitle">—</div>
+      <div class="player-artist" id="playerArtist">—</div>
+    </div>
+    <div class="player-controls">
+      <audio id="audioEl" preload="none"></audio>
+      <button id="btnPlay" class="btn-play" onclick="togglePlay()">▶</button>
+      <div class="progress-wrap">
+        <span id="timeCurrent">0:00</span>
+        <input type="range" id="progressBar" value="0" min="0" max="30" step="0.1" oninput="seekAudio(this.value)">
+        <span id="timeTotal">0:30</span>
+      </div>
+      <button class="btn-close-player" onclick="closePlayer()">✕</button>
+    </div>
+  </div>
 
-        <!-- Datos del perfil -->
-        <section class="section-card">
-            <h3 class="section-title">Información general</h3>
-            <div class="perfil-datos">
-                <div class="perfil-dato">
-                    <span class="perfil-label">ID de usuario</span>
-                    <span class="perfil-valor">{{ perfil.usuario_id }}</span>
-                </div>
-                <div class="perfil-dato">
-                    <span class="perfil-label">Estado de ánimo actual</span>
-                    <span class="perfil-valor">
-                        {{ perfil.estado_animo if perfil.estado_animo else "No definido" }}
-                    </span>
-                </div>
-                <div class="perfil-dato">
-                    <span class="perfil-label">Contexto actual</span>
-                    <span class="perfil-valor">
-                        {{ perfil.contexto if perfil.contexto else "No definido" }}
-                    </span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Canciones favoritas -->
-        <section class="section-card">
-            <h3 class="section-title">Canciones favoritas</h3>
-            {% if perfil.canciones_gustadas %}
-            <div class="canciones-lista">
-                {% for cancion in perfil.canciones_gustadas %}
-                <div class="cancion-lista-item">
-                    <span class="cancion-lista-icon">♥</span>
-                    <div>
-                        <span class="cancion-titulo">{{ cancion.titulo }}</span>
-                        <span class="cancion-artista"> — {{ cancion.artista }}</span>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="empty-state">Aún no tienes canciones favoritas.</p>
-            {% endif %}
-        </section>
-
-        <!-- Canciones descartadas -->
-        <section class="section-card">
-            <h3 class="section-title">Canciones descartadas</h3>
-            {% if perfil.canciones_no_gustadas %}
-            <div class="canciones-lista">
-                {% for cancion in perfil.canciones_no_gustadas %}
-                <div class="cancion-lista-item">
-                    <span class="cancion-lista-icon cancion-lista-icon-no">✕</span>
-                    <div>
-                        <span class="cancion-titulo">{{ cancion.titulo }}</span>
-                        <span class="cancion-artista"> — {{ cancion.artista }}</span>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="empty-state">No has descartado ninguna canción.</p>
-            {% endif %}
-        </section>
-
-        <div class="perfil-volver">
-            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
-                ← Volver al dashboard
-            </a>
-        </div>
-
-    </main>
-
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
-
 </html>

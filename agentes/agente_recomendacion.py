@@ -1,213 +1,231 @@
 # ==================== AGENTE DE RECOMENDACIÓN ====================
-# Responsabilidad: consultar el grafo RDF mediante SPARQL y generar
-# una lista de canciones recomendadas según el perfil del usuario.
+# Responsabilidad: generar recomendaciones personalizadas desde el grafo RDF.
+# Mejorado: scoring por perfil de usuario (géneros/artistas favoritos vs rechazados).
 
-from rdflib import Graph, Namespace
+from rdflib import Graph, Namespace, Literal
+from rdflib.namespace import RDF, XSD
 import os
-
-# ==================== CONFIGURACIÓN ====================
+import urllib.request
+import urllib.parse
+import json
 
 MM = Namespace("http://www.semanticweb.org/moodmusic#")
-RUTA_GRAFO = os.path.join(os.path.dirname(__file__), "..", "datos", "grafo.ttl")
 
+GRAFO_PATH = os.path.join(os.path.dirname(__file__), "..", "datos", "grafo.ttl")
 
-# ==================== CLASE PRINCIPAL ====================
+# Todos los géneros que maneja el sistema
+ALL_GENRES = [
+    "Pop", "Rock", "LoFi", "Electronic", "Jazz", "RnB", "Classical",
+    "HipHop", "Reggaeton", "Urbano", "Latin", "Indie", "Salsa", "Metal",
+]
+
 
 class AgenteRecomendacion:
     """
-    Agente encargado de generar recomendaciones musicales
-    personalizadas consultando el grafo RDF con SPARQL.
+    Agente que genera recomendaciones de canciones.
+    
+    Algoritmo de scoring:
+    1. Base: coincidencia de estado de ánimo (requerido) y contexto (+2 puntos).
+    2. Personalización: género favorito del usuario (+2), artista favorito (+3).
+    3. Penalización: género rechazado (-5), canción no gustada (excluida).
+    4. Calificación de la canción normalizada como desempate.
+    
+    Verificación de Deezer: cuando la búsqueda retorna múltiples resultados
+    para el mismo título, se prefiere el que coincida exactamente con el artista
+    registrado en el grafo (evita confusión entre artista y canción homónima).
     """
 
     def __init__(self):
-        self.grafo = Graph()
-        self.grafo.bind("mm", MM)
-        self._cargar_grafo()
+        self.grafo_path = GRAFO_PATH
+        self._cache_grafo = None
+        self._cache_mtime = None
 
-    # ==================== CARGA ====================
+    # ──────────────────────────────────────────────
+    # Carga del grafo con caché
+    # ──────────────────────────────────────────────
 
-    def _cargar_grafo(self):
-        """Carga el grafo RDF desde el archivo .ttl."""
-        if os.path.exists(RUTA_GRAFO):
-            self.grafo.parse(RUTA_GRAFO, format="turtle")
+    def _grafo(self):
+        mtime = os.path.getmtime(self.grafo_path) if os.path.exists(self.grafo_path) else 0
+        if self._cache_grafo is None or mtime != self._cache_mtime:
+            g = Graph()
+            if os.path.exists(self.grafo_path):
+                g.parse(self.grafo_path, format="turtle")
+            self._cache_grafo = g
+            self._cache_mtime = mtime
+        return self._cache_grafo
 
-    def recargar_grafo(self):
+    # ──────────────────────────────────────────────
+    # Serialización de una canción
+    # ──────────────────────────────────────────────
+
+    def _cancion_dict(self, g, cancion_uri):
+        local = str(cancion_uri).split("#")[-1]
+        titulo = str(g.value(cancion_uri, MM.titulo) or "")
+        artista = str(g.value(cancion_uri, MM.artista) or "")
+        genero_uri = g.value(cancion_uri, MM.perteneceAGenero)
+        genero = str(genero_uri).split("#")[-1] if genero_uri else ""
+        calificacion = float(g.value(cancion_uri, MM.calificacion) or 0)
+        duracion = str(g.value(cancion_uri, MM.duracion) or "")
+        animo_uri = g.value(cancion_uri, MM.aptoParaAnimo)
+        animo = str(animo_uri).split("#")[-1] if animo_uri else ""
+        contexto_uri = g.value(cancion_uri, MM.aptoParaContexto)
+        contexto = str(contexto_uri).split("#")[-1] if contexto_uri else ""
+        return {
+            "id": local,
+            "titulo": titulo,
+            "artista": artista,
+            "genero": genero,
+            "calificacion": calificacion,
+            "duracion": duracion,
+            "animo": animo,
+            "contexto": contexto,
+        }
+
+    # ──────────────────────────────────────────────
+    # Recomendación principal
+    # ──────────────────────────────────────────────
+
+    def recomendar(
+        self,
+        usuario_id: str,
+        estado_animo: str,
+        contexto: str,
+        canciones_no_gustadas: list = None,
+        generos_favoritos: list = None,
+        artistas_favoritos: list = None,
+        generos_rechazados: list = None,
+        limite: int = 10,
+    ) -> list:
+        g = self._grafo()
+        excluidas = set(canciones_no_gustadas or [])
+        favs_g = set(generos_favoritos or [])
+        favs_a = set(artistas_favoritos or [])
+        rech_g = set(generos_rechazados or [])
+
+        candidatos = []
+        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
+            c = self._cancion_dict(g, cancion_uri)
+
+            # Filtro hard: excluir no gustadas
+            if c["id"] in excluidas:
+                continue
+
+            # Filtro hard: sólo el estado de ánimo correcto
+            if c["animo"] != estado_animo:
+                continue
+
+            # Scoring
+            score = 0.0
+
+            # Contexto coincide
+            if c["contexto"] == contexto:
+                score += 2.0
+
+            # Género favorito
+            if c["genero"] in favs_g:
+                score += 2.0
+
+            # Artista favorito
+            if c["artista"] in favs_a:
+                score += 3.0
+
+            # Género rechazado
+            if c["genero"] in rech_g:
+                score -= 5.0
+
+            # Calificación como desempate
+            score += c["calificacion"] * 0.1
+
+            candidatos.append((score, c))
+
+        # Ordenar por score descendente
+        candidatos.sort(key=lambda x: x[0], reverse=True)
+
+        return [c for _, c in candidatos[:limite]]
+
+    # ──────────────────────────────────────────────
+    # Recomendación por género
+    # ──────────────────────────────────────────────
+
+    def recomendar_por_genero(self, genero: str, limite: int = 10) -> list:
+        g = self._grafo()
+        canciones = []
+        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
+            genero_uri = g.value(cancion_uri, MM.perteneceAGenero)
+            genero_local = str(genero_uri).split("#")[-1] if genero_uri else ""
+            if genero_local == genero:
+                c = self._cancion_dict(g, cancion_uri)
+                canciones.append(c)
+        canciones.sort(key=lambda x: x["calificacion"], reverse=True)
+        return canciones[:limite]
+
+    # ──────────────────────────────────────────────
+    # Mejor valoradas
+    # ──────────────────────────────────────────────
+
+    def obtener_mejor_valoradas(self, limite: int = 5) -> list:
+        g = self._grafo()
+        canciones = []
+        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
+            c = self._cancion_dict(g, cancion_uri)
+            canciones.append(c)
+        canciones.sort(key=lambda x: x["calificacion"], reverse=True)
+        return canciones[:limite]
+
+    # ──────────────────────────────────────────────
+    # Géneros disponibles en el grafo
+    # ──────────────────────────────────────────────
+
+    def generos_disponibles(self) -> list:
+        """Retorna los géneros que realmente tienen canciones en el grafo."""
+        g = self._grafo()
+        generos = set()
+        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
+            genero_uri = g.value(cancion_uri, MM.perteneceAGenero)
+            if genero_uri:
+                generos.add(str(genero_uri).split("#")[-1])
+        return sorted(generos)
+
+    # ──────────────────────────────────────────────
+    # Búsqueda de preview en Deezer con verificación de artista
+    # ──────────────────────────────────────────────
+
+    @staticmethod
+    def buscar_preview_deezer(titulo: str, artista: str) -> str | None:
         """
-        Recarga el grafo desde el archivo .ttl.
-        Se llama cada vez que el Agente de Perfil actualiza el grafo,
-        para garantizar que las recomendaciones usen datos frescos.
+        Busca en Deezer el preview de 30s.
+        Si hay varios resultados con el mismo título, prioriza el que coincide
+        exactamente con el artista registrado (evita homonimias artista/canción).
         """
-        self.grafo = Graph()
-        self.grafo.bind("mm", MM)
-        self._cargar_grafo()
+        query = urllib.parse.quote(f"{titulo} {artista}")
+        url = f"https://api.deezer.com/search?q={query}&limit=10"
+        try:
+            with urllib.request.urlopen(url, timeout=6) as r:
+                data = json.loads(r.read())
+            results = data.get("data", [])
+            if not results:
+                return None
 
-    # ==================== CONSULTAS SPARQL ====================
+            # Exacto: título y artista coinciden (case-insensitive)
+            for item in results:
+                t = item.get("title_short") or item.get("title", "")
+                a = item.get("artist", {}).get("name", "")
+                if (t.lower() == titulo.lower() and
+                        a.lower() == artista.lower() and
+                        item.get("preview")):
+                    return item["preview"]
 
-    def _construir_query(self, estado_animo, contexto, canciones_excluidas):
-        """
-        Construye la consulta SPARQL según el perfil del usuario.
+            # Fallback: mismo título, cualquier artista
+            for item in results:
+                t = item.get("title_short") or item.get("title", "")
+                if t.lower() == titulo.lower() and item.get("preview"):
+                    return item["preview"]
 
-        Args:
-            estado_animo (str): Estado de ánimo del usuario. Ej: 'Alegre'
-            contexto (str): Contexto del usuario. Ej: 'Estudio'
-            canciones_excluidas (list): Canciones que no le gustan al usuario.
+            # Último recurso: primer resultado con preview
+            for item in results:
+                if item.get("preview"):
+                    return item["preview"]
 
-        Returns:
-            str: Consulta SPARQL lista para ejecutarse.
-        """
-        # Construir filtro de exclusión dinámicamente
-        if canciones_excluidas:
-            filtros = " && ".join([
-                f'?cancion != mm:{c}' for c in canciones_excluidas
-            ])
-            bloque_filtro = f"FILTER ({filtros})"
-        else:
-            bloque_filtro = ""
-
-        query = f"""
-            PREFIX mm: <http://www.semanticweb.org/moodmusic#>
-
-            SELECT ?cancion ?titulo ?artista ?duracion ?calificacion ?genero
-            WHERE {{
-                ?cancion a mm:Cancion ;
-                         mm:titulo ?titulo ;
-                         mm:artista ?artista ;
-                         mm:duracion ?duracion ;
-                         mm:calificacion ?calificacion ;
-                         mm:perteneceAGenero ?generoUri ;
-                         mm:aptoParaAnimo mm:{estado_animo} ;
-                         mm:aptoParaContexto mm:{contexto} .
-
-                BIND(STRAFTER(STR(?generoUri), "#") AS ?genero)
-
-                {bloque_filtro}
-            }}
-            ORDER BY DESC(?calificacion)
-        """
-        return query
-
-    # ==================== RECOMENDACIONES ====================
-
-    def recomendar(self, usuario_id, estado_animo, contexto, canciones_no_gustadas=None):
-        """
-        Genera una lista de canciones recomendadas para el usuario.
-
-        Args:
-            usuario_id (str): Identificador del usuario.
-            estado_animo (str): Estado de ánimo actual del usuario.
-            contexto (str): Contexto actual del usuario.
-            canciones_no_gustadas (list): Canciones a excluir. Por defecto None.
-
-        Returns:
-            list: Lista de diccionarios con la información de cada canción recomendada.
-        """
-        # Recargar grafo para tener datos actualizados
-        self.recargar_grafo()
-
-        if canciones_no_gustadas is None:
-            canciones_no_gustadas = []
-
-        query = self._construir_query(estado_animo, contexto, canciones_no_gustadas)
-
-        resultados = []
-        for fila in self.grafo.query(query):
-            cancion_id = str(fila.cancion).split("#")[-1]
-            resultados.append({
-                "id": cancion_id,
-                "titulo": str(fila.titulo),
-                "artista": str(fila.artista),
-                "duracion": str(fila.duracion),
-                "calificacion": float(fila.calificacion),
-                "genero": str(fila.genero),
-            })
-
-        return resultados
-
-    def recomendar_por_genero(self, genero, limite=5):
-        """
-        Genera recomendaciones filtradas únicamente por género musical.
-        Útil para el dashboard cuando el usuario quiere explorar un género.
-
-        Args:
-            genero (str): Género musical. Ej: 'Jazz', 'LoFi', 'Rock'
-            limite (int): Cantidad máxima de canciones a retornar.
-
-        Returns:
-            list: Lista de diccionarios con la información de cada canción.
-        """
-        self.recargar_grafo()
-
-        query = f"""
-            PREFIX mm: <http://www.semanticweb.org/moodmusic#>
-
-            SELECT ?cancion ?titulo ?artista ?duracion ?calificacion
-            WHERE {{
-                ?cancion a mm:Cancion ;
-                         mm:titulo ?titulo ;
-                         mm:artista ?artista ;
-                         mm:duracion ?duracion ;
-                         mm:calificacion ?calificacion ;
-                         mm:perteneceAGenero mm:{genero} .
-            }}
-            ORDER BY DESC(?calificacion)
-            LIMIT {limite}
-        """
-
-        resultados = []
-        for fila in self.grafo.query(query):
-            cancion_id = str(fila.cancion).split("#")[-1]
-            resultados.append({
-                "id": cancion_id,
-                "titulo": str(fila.titulo),
-                "artista": str(fila.artista),
-                "duracion": str(fila.duracion),
-                "calificacion": float(fila.calificacion),
-                "genero": genero,
-            })
-
-        return resultados
-
-    def obtener_mejor_valoradas(self, limite=5):
-        """
-        Retorna las canciones mejor valoradas del grafo.
-        Útil para mostrar en el dashboard como sección destacada.
-
-        Args:
-            limite (int): Cantidad máxima de canciones a retornar.
-
-        Returns:
-            list: Lista de diccionarios con la información de cada canción.
-        """
-        self.recargar_grafo()
-
-        query = f"""
-            PREFIX mm: <http://www.semanticweb.org/moodmusic#>
-
-            SELECT ?cancion ?titulo ?artista ?duracion ?calificacion ?genero
-            WHERE {{
-                ?cancion a mm:Cancion ;
-                         mm:titulo ?titulo ;
-                         mm:artista ?artista ;
-                         mm:duracion ?duracion ;
-                         mm:calificacion ?calificacion ;
-                         mm:perteneceAGenero ?generoUri .
-
-                BIND(STRAFTER(STR(?generoUri), "#") AS ?genero)
-            }}
-            ORDER BY DESC(?calificacion)
-            LIMIT {limite}
-        """
-
-        resultados = []
-        for fila in self.grafo.query(query):
-            cancion_id = str(fila.cancion).split("#")[-1]
-            resultados.append({
-                "id": cancion_id,
-                "titulo": str(fila.titulo),
-                "artista": str(fila.artista),
-                "duracion": str(fila.duracion),
-                "calificacion": float(fila.calificacion),
-                "genero": str(fila.genero),
-            })
-
-        return resultados
+            return None
+        except Exception:
+            return None

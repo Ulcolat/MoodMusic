@@ -1,0 +1,17 @@
+<div class="song-card" data-id="{{ cancion.id }}" data-titulo="{{ cancion.titulo }}" data-artista="{{ cancion.artista }}">
+  <div class="song-meta">
+    <div class="song-cover">🎵</div>
+    <div>
+      <div class="song-title">{{ cancion.titulo }}</div>
+      <div class="song-artist">{{ cancion.artista }}</div>
+      <div class="song-tags">
+        <span class="tag tag-genre">{{ cancion.genero }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="song-actions">
+    <span class="song-rating">★ {{ "%.1f"|format(cancion.calificacion) }}</span>
+    <span class="song-duration">{{ cancion.duracion }}</span>
+    <button class="btn-icon btn-play-song" title="Reproducir" onclick="playSong('{{ cancion.titulo }}','{{ cancion.artista }}','{{ cancion.titulo }}','{{ cancion.artista }}')">▶</button>
+  </div>
+</div>

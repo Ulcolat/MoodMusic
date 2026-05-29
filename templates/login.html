@@ -1,95 +1,188 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoodMusic — Iniciar sesión</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body class="auth-body">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoodMusic – Acceder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- ==================== FONDO ANIMADO ==================== -->
-    <div class="bg-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a0f;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Fondo animado */
+    .bg-orbs {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.18;
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb-1 { width: 500px; height: 500px; background: #7c3aed; top: -15%; left: -10%; animation-delay: 0s; }
+    .orb-2 { width: 400px; height: 400px; background: #2563eb; top: 50%; right: -10%; animation-delay: 3s; }
+    .orb-3 { width: 300px; height: 300px; background: #db2777; bottom: -10%; left: 30%; animation-delay: 6s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50%       { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .login-wrapper {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 520px;
+      width: min(900px, 95vw);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+    }
+
+    /* Panel izquierdo – branding */
+    .brand-panel {
+      background: linear-gradient(145deg, #7c3aed, #2563eb 60%, #db2777);
+      padding: 48px 40px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      color: #fff;
+    }
+    .brand-logo { display: flex; align-items: center; gap: 12px; }
+    .brand-logo svg { width: 40px; height: 40px; }
+    .brand-logo span { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+    .brand-tagline { font-size: 2rem; font-weight: 700; line-height: 1.2; margin-top: 40px; }
+    .brand-tagline span { opacity: 0.7; font-weight: 300; }
+    .brand-features { list-style: none; }
+    .brand-features li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.9rem; opacity: 0.85; padding: 6px 0;
+    }
+    .brand-features li::before { content: "✓"; font-weight: 700; font-size: 0.8rem; }
+    .brand-note { font-size: 0.75rem; opacity: 0.5; }
+
+    /* Panel derecho – formulario */
+    .form-panel {
+      background: #13131a;
+      padding: 48px 40px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .form-panel h2 { font-size: 1.6rem; font-weight: 700; color: #f1f1f5; margin-bottom: 4px; }
+    .form-panel p { font-size: 0.875rem; color: #6b6b80; margin-bottom: 32px; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: 0.8rem; font-weight: 500;
+      color: #9999b0; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .form-group input {
+      width: 100%; padding: 12px 16px;
+      background: #1e1e2e; border: 1.5px solid #2a2a3e;
+      border-radius: 10px; color: #f1f1f5; font-size: 0.9rem; font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+    }
+    .form-group input::placeholder { color: #444; }
+
+    .btn-login {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      border: none; border-radius: 10px;
+      color: #fff; font-size: 0.95rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .btn-login:hover { opacity: 0.9; }
+    .btn-login:active { transform: scale(0.99); }
+
+    .error-box {
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35);
+      border-radius: 8px; padding: 12px 14px; margin-bottom: 20px;
+      color: #fca5a5; font-size: 0.85rem;
+    }
+
+    .disclaimer {
+      font-size: 0.75rem; color: #444; margin-top: 20px; text-align: center;
+    }
+    .disclaimer a { color: #7c3aed; text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .login-wrapper { grid-template-columns: 1fr; }
+      .brand-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="login-wrapper">
+    <!-- Branding -->
+    <div class="brand-panel">
+      <div>
+        <div class="brand-logo">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" fill="rgba(255,255,255,0.15)"/>
+            <path d="M14 28V13l16 7.5L14 28z" fill="white"/>
+          </svg>
+          <span>MoodMusic</span>
+        </div>
+        <div class="brand-tagline">
+          Música que<br><span>siente</span> lo que tú sientes.
+        </div>
+      </div>
+      <ul class="brand-features">
+        <li>Recomendaciones personalizadas por estado de ánimo</li>
+        <li>Más de 2 000 canciones en el catálogo</li>
+        <li>Previews de 30 segundos via Deezer</li>
+        <li>Aprende de tus gustos con cada interacción</li>
+      </ul>
+      <p class="brand-note">Sistema multiagente con ontología RDF · Proyecto académico</p>
     </div>
 
-    <!-- ==================== CONTENEDOR LOGIN ==================== -->
-    <main class="auth-container">
+    <!-- Formulario -->
+    <div class="form-panel">
+      <h2>Bienvenido</h2>
+      <p>Ingresa tus datos para continuar. Si es tu primera vez, crearemos tu perfil automáticamente.</p>
 
-        <!-- Logo y título -->
-        <div class="auth-header">
-            <div class="logo-icon">♪</div>
-            <h1 class="logo-text">MoodMusic</h1>
-            <p class="auth-subtitle">Tu música, según tu estado de ánimo</p>
+      {% if error %}
+      <div class="error-box">⚠️ {{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+          <label>ID de usuario</label>
+          <input type="text" name="usuario_id" placeholder="ej. juan123" required autocomplete="username">
         </div>
-
-        <!-- Mensaje de error -->
-        {% if error %}
-        <div class="alert alert-error">
-            <span class="alert-icon">⚠</span>
-            <span>{{ error }}</span>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" name="nombre" placeholder="Tu nombre" required autocomplete="name">
         </div>
-        {% endif %}
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" name="email" placeholder="correo@ejemplo.com" required autocomplete="email">
+        </div>
+        <button type="submit" class="btn-login">Entrar a MoodMusic →</button>
+      </form>
 
-        <!-- Formulario -->
-        <form class="auth-form" method="POST" action="{{ url_for('login') }}">
-
-            <div class="form-group">
-                <label class="form-label" for="usuario_id">ID de usuario</label>
-                <input
-                    class="form-input"
-                    type="text"
-                    id="usuario_id"
-                    name="usuario_id"
-                    placeholder="Ej: usuario123"
-                    autocomplete="off"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="nombre">Nombre</label>
-                <input
-                    class="form-input"
-                    type="text"
-                    id="nombre"
-                    name="nombre"
-                    placeholder="Tu nombre"
-                    autocomplete="off"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="email">Correo electrónico</label>
-                <input
-                    class="form-input"
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="tu@correo.com"
-                    autocomplete="off"
-                    required
-                >
-            </div>
-
-            <button class="btn btn-primary btn-full" type="submit">
-                <span>Entrar</span>
-                <span class="btn-icon">→</span>
-            </button>
-
-        </form>
-
-        <p class="auth-footer">
-            Si ya tienes cuenta, ingresa tu ID y te reconoceremos.
-        </p>
-
-    </main>
-
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+      <p class="disclaimer">
+        Tu perfil y preferencias se guardan de forma local.<br>
+        No requiere contraseña — el ID es tu identificador.
+      </p>
+    </div>
+  </div>
 </body>
 </html>

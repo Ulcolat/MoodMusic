@@ -1,0 +1,523 @@
+@prefix mm: <http://www.semanticweb.org/moodmusic#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+mm:Cancion10 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Ejercicio ;
+    mm:artista "Eminem" ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "4:57" ;
+    mm:perteneceAGenero mm:HipHop ;
+    mm:titulo "Till I Collapse" .
+
+mm:Cancion11 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Trabajo ;
+    mm:artista "Eminem" ;
+    mm:calificacion "5.0"^^xsd:float ;
+    mm:duracion "5:26" ;
+    mm:perteneceAGenero mm:HipHop ;
+    mm:titulo "Lose Yourself" .
+
+mm:Cancion12 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Ejercicio ;
+    mm:artista "Beyonce" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:57" ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "Run The World" .
+
+mm:Cancion13 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Ejercicio ;
+    mm:artista "Kanye West" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "4:52" ;
+    mm:perteneceAGenero mm:HipHop ;
+    mm:titulo "Power" .
+
+mm:Cancion14 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Ejercicio ;
+    mm:artista "Darude" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:44" ;
+    mm:perteneceAGenero mm:Electronic ;
+    mm:titulo "Sandstorm" .
+
+mm:Cancion15 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Bad Bunny" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "3:40" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Dakiti" .
+
+mm:Cancion16 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "KAROL G" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:28" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Provenza" .
+
+mm:Cancion17 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Estudio ;
+    mm:artista "Lofi Girl" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:45" ;
+    mm:perteneceAGenero mm:LoFi ;
+    mm:titulo "Chill Lofi Study" .
+
+mm:Cancion18 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Estudio ;
+    mm:artista "Broke for Free" ;
+    mm:calificacion "4.5"^^xsd:float ;
+    mm:duracion "4:02" ;
+    mm:perteneceAGenero mm:LoFi ;
+    mm:titulo "Night Owl" .
+
+mm:Cancion19 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Descanso ;
+    mm:artista "Erik Satie" ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "3:05" ;
+    mm:perteneceAGenero mm:Classical ;
+    mm:titulo "Gymnopédie No.1" .
+
+mm:Cancion2 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Dua Lipa" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:23" ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "Levitating" .
+
+mm:Cancion20 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Estudio ;
+    mm:artista "Petit Biscuit" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "4:12" ;
+    mm:perteneceAGenero mm:Indie ;
+    mm:titulo "Sunset Lover" .
+
+mm:Cancion21 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Descanso ;
+    mm:artista "The xx" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "2:08" ;
+    mm:perteneceAGenero mm:Indie ;
+    mm:titulo "Intro" .
+
+mm:Cancion22 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Feid" ;
+    mm:calificacion "4.5"^^xsd:float ;
+    mm:duracion "3:22" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Al Aire" .
+
+mm:Cancion23 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Alvaro Diaz" ;
+    mm:calificacion "4.4"^^xsd:float ;
+    mm:duracion "3:15" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Tengo un Amor" .
+
+mm:Cancion24 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Adele" ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "4:45" ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "Someone Like You" .
+
+mm:Cancion25 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Lord Huron" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:28" ;
+    mm:perteneceAGenero mm:Indie ;
+    mm:titulo "The Night We Met" .
+
+mm:Cancion26 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Descanso ;
+    mm:artista "Johnny Cash" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "3:38" ;
+    mm:perteneceAGenero mm:Rock ;
+    mm:titulo "Hurt" .
+
+mm:Cancion27 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Maluma" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:25" ;
+    mm:perteneceAGenero mm:Reggaeton ;
+    mm:titulo "Hawai" .
+
+mm:Cancion28 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "KAROL G" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:10" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Si Antes Te Hubiera Conocido" .
+
+mm:Cancion29 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "J Balvin" ;
+    mm:calificacion "4.5"^^xsd:float ;
+    mm:duracion "4:01" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "La Cancion" .
+
+mm:Cancion3 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Harry Styles" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "2:37" ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "As It Was" .
+
+mm:Cancion30 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Feid" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:33" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Saturno" .
+
+mm:Cancion31 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "John Legend" ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "4:29" ;
+    mm:perteneceAGenero mm:RnB ;
+    mm:titulo "All of Me" .
+
+mm:Cancion32 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Frank Sinatra" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "2:27" ;
+    mm:perteneceAGenero mm:Jazz ;
+    mm:titulo "Fly Me to the Moon" .
+
+mm:Cancion33 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Ed Sheeran" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "4:23" ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "Perfect" .
+
+mm:Cancion35 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Alvaro Diaz" ;
+    mm:calificacion "4.5"^^xsd:float ;
+    mm:duracion "3:25" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Sensaciones" .
+
+mm:Cancion37 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "BTS" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "2:44" ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "Butter" .
+
+mm:Cancion38 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Estresado ;
+    mm:aptoParaContexto mm:Descanso ;
+    mm:artista "Marconi Union" ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "8:09" ;
+    mm:perteneceAGenero mm:Classical ;
+    mm:titulo "Weightless" .
+
+mm:Cancion39 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Estresado ;
+    mm:aptoParaContexto mm:Descanso ;
+    mm:artista "Claude Debussy" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "5:00" ;
+    mm:perteneceAGenero mm:Classical ;
+    mm:titulo "Claire de Lune" .
+
+mm:Cancion40 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Estresado ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Pink Floyd" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "2:49" ;
+    mm:perteneceAGenero mm:Rock ;
+    mm:titulo "Breathe" .
+
+mm:Cancion41 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Estresado ;
+    mm:aptoParaContexto mm:Descanso ;
+    mm:artista "Ludovico Einaudi" ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "5:15" ;
+    mm:perteneceAGenero mm:Classical ;
+    mm:titulo "Experience" .
+
+mm:Cancion42 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Estresado ;
+    mm:aptoParaContexto mm:Descanso ;
+    mm:artista "Yann Tiersen" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "2:22" ;
+    mm:perteneceAGenero mm:Classical ;
+    mm:titulo "Comptine d'un autre ete" .
+
+mm:Cancion43 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Trabajo ;
+    mm:artista "Daft Punk" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "4:07" ;
+    mm:perteneceAGenero mm:Electronic ;
+    mm:titulo "Get Lucky" .
+
+mm:Cancion44 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Trabajo ;
+    mm:artista "Daft Punk" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "7:07" ;
+    mm:perteneceAGenero mm:Electronic ;
+    mm:titulo "Around the World" .
+
+mm:Cancion45 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Trabajo ;
+    mm:artista "Daft Punk" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "5:20" ;
+    mm:perteneceAGenero mm:Electronic ;
+    mm:titulo "One More Time" .
+
+mm:Cancion46 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Trabajo ;
+    mm:artista "The Weeknd" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:50" ;
+    mm:perteneceAGenero mm:RnB ;
+    mm:titulo "Starboy" .
+
+mm:Cancion47 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Feid" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:12" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "FERXXO" .
+
+mm:Cancion48 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Alvaro Diaz" ;
+    mm:calificacion "4.5"^^xsd:float ;
+    mm:duracion "3:05" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Niña Bonita" .
+
+mm:Cancion49 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Bad Bunny" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "4:18" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Moscow Mule" .
+
+mm:Cancion5 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "KAROL G" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:19" ;
+    mm:perteneceAGenero mm:Reggaeton ;
+    mm:titulo "Tusa" .
+
+mm:Cancion7 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Manuel Turizo" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:10" ;
+    mm:perteneceAGenero mm:Latin ;
+    mm:titulo "La Bachata" .
+
+mm:Cancion8 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Ivy Queen" ;
+    mm:calificacion "4.4"^^xsd:float ;
+    mm:duracion "3:50" ;
+    mm:perteneceAGenero mm:Salsa ;
+    mm:titulo "Noche de Bodas" .
+
+mm:Cancion9 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Energico ;
+    mm:aptoParaContexto mm:Ejercicio ;
+    mm:artista "Kanye West" ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "5:11" ;
+    mm:perteneceAGenero mm:HipHop ;
+    mm:titulo "Stronger" .
+
+mm:Davo a mm:Usuario ;
+    mm:email "samuel@gmail.com"^^xsd:string ;
+    mm:estaEnContexto mm:Casa ;
+    mm:leGusta mm:Cancion4,
+        mm:Cancion50,
+        mm:Cancion6 ;
+    mm:noLeGusta mm:Cancion1 ;
+    mm:nombre "Samuel"^^xsd:string ;
+    mm:tieneEstadoDeAnimo mm:Romantico .
+
+mm:Metal a mm:Genero .
+
+mm:usuario123 a mm:Usuario ;
+    mm:email "dubanblanco123@gmail.com"^^xsd:string ;
+    mm:estaEnContexto mm:Casa ;
+    mm:leGusta mm:Cancion34,
+        mm:Cancion36 ;
+    mm:nombre "Duban"^^xsd:string ;
+    mm:tieneEstadoDeAnimo mm:Romantico .
+
+mm:Cancion1 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "The Weeknd" ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "3:20" ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "Blinding Lights" .
+
+mm:Cancion34 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Feid" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:18" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Una Vez" .
+
+mm:Cancion36 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Feid" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:40" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Medallo" .
+
+mm:Cancion4 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Farruko" ;
+    mm:calificacion "4.7"^^xsd:float ;
+    mm:duracion "3:45" ;
+    mm:perteneceAGenero mm:Reggaeton ;
+    mm:titulo "Pepas" .
+
+mm:Cancion50 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Bad Bunny" ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "2:58" ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Efecto" .
+
+mm:Cancion6 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Maluma" ;
+    mm:calificacion "4.5"^^xsd:float ;
+    mm:duracion "3:31" ;
+    mm:perteneceAGenero mm:Reggaeton ;
+    mm:titulo "Felices los 4" .
+
+mm:Jazz a mm:Genero .
+
+mm:Latin a mm:Genero .
+
+mm:Salsa a mm:Genero .
+
+mm:LoFi a mm:Genero .
+
+mm:RnB a mm:Genero .
+
+mm:Rock a mm:Genero .
+
+mm:Estudio a mm:Contexto .
+
+mm:Indie a mm:Genero .
+
+mm:Electronic a mm:Genero .
+
+mm:HipHop a mm:Genero .
+
+mm:Reggaeton a mm:Genero .
+
+mm:Classical a mm:Genero .
+
+mm:Ejercicio a mm:Contexto .
+
+mm:Estresado a mm:EstadoDeAnimo .
+
+mm:Trabajo a mm:Contexto .
+
+mm:Descanso a mm:Contexto .
+
+mm:Pop a mm:Genero .
+
+mm:Triste a mm:EstadoDeAnimo .
+
+mm:Alegre a mm:EstadoDeAnimo .
+
+mm:Energico a mm:EstadoDeAnimo .
+
+mm:Romantico a mm:EstadoDeAnimo .
+
+mm:Tranquilo a mm:EstadoDeAnimo .
+
+mm:Fiesta a mm:Contexto .
+
+mm:Urbano a mm:Genero .
+
+mm:Casa a mm:Contexto .
+
