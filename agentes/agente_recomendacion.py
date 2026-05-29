@@ -8,10 +8,22 @@ import os
 import urllib.request
 import urllib.parse
 import json
+try:
+    from SPARQLWrapper import SPARQLWrapper, JSON
+    _HAS_SPARQLWRAPPER = True
+except Exception:
+    SPARQLWrapper = None
+    _HAS_SPARQLWRAPPER = False
 
 MM = Namespace("http://www.semanticweb.org/moodmusic#")
 
 GRAFO_PATH = os.path.join(os.path.dirname(__file__), "..", "datos", "grafo.ttl")
+
+PREFIXES = """
+PREFIX mm: <http://www.semanticweb.org/moodmusic#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+"""
 
 # Todos los géneros que maneja el sistema
 ALL_GENRES = [
@@ -42,6 +54,13 @@ class AgenteRecomendacion:
         self.grafo_path = GRAFO_PATH
         self._cache_grafo = None
         self._cache_mtime = None
+        # Cache simple de portadas para evitar llamadas repetidas a Deezer
+        self._cover_cache = {}
+        # Endpoint SPARQL (Fuseki/Jena) opcional. Configurar con la variable de entorno
+        # SPARQL_ENDPOINT o FUSEKI_ENDPOINT (por ejemplo http://localhost:3030/moodmusic/query)
+        self.sparql_endpoint = os.environ.get("SPARQL_ENDPOINT") or os.environ.get("FUSEKI_ENDPOINT")
+        if self.sparql_endpoint and not _HAS_SPARQLWRAPPER:
+            raise RuntimeError("SPARQL endpoint configurado pero falta la dependencia SPARQLWrapper. Instala SPARQLWrapper.")
 
     # ──────────────────────────────────────────────
     # Carga del grafo con caché
@@ -56,6 +75,134 @@ class AgenteRecomendacion:
             self._cache_grafo = g
             self._cache_mtime = mtime
         return self._cache_grafo
+
+    def _sparql_enabled(self):
+        return bool(self.sparql_endpoint)
+
+    def _execute_sparql(self, query):
+        if not self._sparql_enabled():
+            return None
+        sparql = SPARQLWrapper(self.sparql_endpoint)
+        sparql.setQuery(query)
+        sparql.setReturnFormat(JSON)
+        return sparql.query().convert()
+
+    @staticmethod
+    def _sparql_literal_escape(value: str) -> str:
+        return str(value).replace("\\", "\\\\").replace('"', '\\"')
+
+    def _query_song_uris(self, animo=None, ctx=None, limit=200, rech_g_uris=None, excluidas_uris=None):
+        prefixes = """
+PREFIX mm: <http://www.semanticweb.org/moodmusic#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+"""
+
+        where = ["?s rdf:type mm:Cancion ."]
+        if animo:
+            where.append(f"?s mm:aptoParaAnimo mm:{animo} .")
+        if ctx:
+            where.append(f"?s mm:aptoParaContexto mm:{ctx} .")
+        if rech_g_uris:
+            uris = ", ".join(f"<{u}>" for u in rech_g_uris)
+            where.append(f"FILTER NOT EXISTS {{ ?s mm:perteneceAGenero ?g . FILTER(?g IN ({uris})) }} .")
+        if excluidas_uris:
+            excl = ", ".join(f"<{u}>" for u in excluidas_uris)
+            where.append(f"FILTER (?s NOT IN ({excl})) .")
+
+        q = prefixes + "SELECT DISTINCT ?s WHERE { " + " ".join(where) + " }"
+        if limit:
+            q += f" LIMIT {limit}"
+
+        if self._sparql_enabled():
+            try:
+                data = self._execute_sparql(q)
+                return [row["s"]["value"] for row in data.get("results", {}).get("bindings", []) if row.get("s")]
+            except Exception:
+                pass
+
+        try:
+            g = self._grafo()
+            res = g.query(q)
+            return [row.s for row in res]
+        except Exception:
+            return [s for s in self._grafo().subjects(RDF.type, MM.Cancion)]
+
+    def _query_songs_with_metadata(self, animo=None, ctx=None, limit=200, rech_g_uris=None, excluidas_uris=None):
+        """Return a list of song dicts with metadata. Use remote SPARQL when available,
+        otherwise fall back to the local graph and `_cancion_dict`.
+        """
+        prefixes = PREFIXES
+        where = ["?s rdf:type mm:Cancion ."]
+        if animo:
+            where.append(f"?s mm:aptoParaAnimo mm:{animo} .")
+        if ctx:
+            where.append(f"?s mm:aptoParaContexto mm:{ctx} .")
+        if rech_g_uris:
+            uris = ", ".join(f"<{u}>" for u in rech_g_uris)
+            where.append(f"FILTER NOT EXISTS {{ ?s mm:perteneceAGenero ?g . FILTER(?g IN ({uris})) }} .")
+        if excluidas_uris:
+            excl = ", ".join(f"<{u}>" for u in excluidas_uris)
+            where.append(f"FILTER (?s NOT IN ({excl})) .")
+
+        q = prefixes + (
+            "SELECT DISTINCT ?s ?titulo ?artista ?genero ?cal ?dur "
+            "(GROUP_CONCAT(DISTINCT STR(?a); separator=\"|\") AS ?animos) "
+            "(GROUP_CONCAT(DISTINCT STR(?c); separator=\"|\") AS ?contextos) WHERE { "
+            + " ".join(where)
+            + " OPTIONAL { ?s mm:titulo ?titulo } OPTIONAL { ?s mm:artista ?artista } OPTIONAL { ?s mm:perteneceAGenero ?genero } OPTIONAL { ?s mm:calificacion ?cal } OPTIONAL { ?s mm:duracion ?dur } OPTIONAL { ?s mm:aptoParaAnimo ?a } OPTIONAL { ?s mm:aptoParaContexto ?c } } GROUP BY ?s ?titulo ?artista ?genero ?cal ?dur LIMIT "
+            + str(limit)
+        )
+
+        results = None
+        if self._sparql_enabled():
+            try:
+                data = self._execute_sparql(q)
+                bindings = data.get("results", {}).get("bindings", []) if data else []
+                out = []
+                for row in bindings:
+                    uri = row.get("s", {}).get("value")
+                    if not uri:
+                        continue
+                    local = str(uri).split("#")[-1]
+                    titulo = row.get("titulo", {}).get("value", "") if row.get("titulo") else ""
+                    artista = row.get("artista", {}).get("value", "") if row.get("artista") else ""
+                    genero_uri = row.get("genero", {}).get("value") if row.get("genero") else None
+                    genero = str(genero_uri).split("#")[-1] if genero_uri else ""
+                    cal = float(row.get("cal", {}).get("value", 0)) if row.get("cal") else 0.0
+                    dur = row.get("dur", {}).get("value", "") if row.get("dur") else ""
+                    animos_raw = row.get("animos", {}).get("value", "") if row.get("animos") else ""
+                    contextos_raw = row.get("contextos", {}).get("value", "") if row.get("contextos") else ""
+                    animos = [str(x).split("#")[-1] for x in animos_raw.split("|") if x]
+                    contextos = [str(x).split("#")[-1] for x in contextos_raw.split("|") if x]
+                    out.append({
+                        "id": local,
+                        "uri": uri,
+                        "titulo": titulo,
+                        "artista": artista,
+                        "genero": genero,
+                        "calificacion": cal,
+                        "duracion": dur,
+                        "animos": animos,
+                        "contextos": contextos,
+                    })
+                results = out
+            except Exception:
+                results = None
+
+        if results is None:
+            # Fallback: use local graph and existing helper
+            uris = self._query_song_uris(animo=animo, ctx=ctx, limit=limit, rech_g_uris=rech_g_uris, excluidas_uris=excluidas_uris)
+            g = self._grafo()
+            res = []
+            for u in uris:
+                try:
+                    c = self._cancion_dict(g, u)
+                    res.append(c)
+                except Exception:
+                    continue
+            results = res
+
+        return results
 
     # ──────────────────────────────────────────────
     # Serialización de una canción
@@ -153,60 +300,169 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 where.append(f"FILTER (?s NOT IN ({excl})) .")
             return where
 
-        def _query_song_uris(animo=None, ctx=None, limit=200):
-            where = _build_where(animo, ctx)
-            q = prefixes + "SELECT DISTINCT ?s WHERE { " + " ".join(where) + " } LIMIT %d" % limit
-            try:
-                res = g.query(q)
-                return [row.s for row in res]
-            except Exception:
-                # Fallback a recorrido clásico si SPARQL falla
-                return list(g.subjects(RDF.type, MM.Cancion))
-
-        nivel1_uris = _query_song_uris(animo=estado_animo, ctx=contexto, limit=300)
-        nivel2_uris = _query_song_uris(animo=estado_animo, ctx=None, limit=500)
-        nivel3_uris = _query_song_uris(animo=None, ctx=None, limit=1000)
-
-        seen = set()
+        # Attempt server-side scoring via SPARQL for speed. If it fails, fall back
+        # to the previous multi-level candidate approach.
         nivel1, nivel2, nivel3 = [], [], []
+        if self._sparql_enabled():
+            try:
+                # Prepare favorites lists for SPARQL
+                fav_genres = [self._sparql_literal_escape(g) for g in favs_g]
+                fav_artists = [self._sparql_literal_escape(a) for a in favs_a]
 
-        for uri in nivel1_uris:
-            local = str(uri).split('#')[-1]
-            if local in seen:
-                continue
-            c = self._cancion_dict(g, uri)
-            if c['id'] in excluidas:
-                continue
-            if c['genero'] in rech_g:
-                continue
-            seen.add(c['id'])
-            nivel1.append((_score(c, True), c))
+                fav_genres_cond = (
+                    "LCASE(STRAFTER(STR(?genero), \"#\")) IN (" + ", ".join([f"lcase(\"{fg}\")" for fg in fav_genres]) + ")"
+                    if fav_genres else "false"
+                )
+                fav_artists_cond = (
+                    ", ".join([f"lcase(\"{fa}\")" for fa in fav_artists])
+                )
 
-        for uri in nivel2_uris:
-            local = str(uri).split('#')[-1]
-            if local in seen:
-                continue
-            c = self._cancion_dict(g, uri)
-            if c['id'] in excluidas:
-                continue
-            if c['genero'] in rech_g:
-                continue
-            if estado_animo in c.get('animos', []):
+                fav_artist_score_expr = (f"IF(LCASE(STR(?artista)) IN ({fav_artists_cond}), 6, 0)" if fav_artists else "0")
+                fav_genre_score_expr = (f"IF({fav_genres_cond}, 4, 0)" if fav_genres else "0")
+
+                excl_clause = ""
+                if excluidas_uris:
+                    excl = ", ".join(f"<{u}>" for u in excluidas_uris)
+                    excl_clause = f"FILTER (?s NOT IN ({excl})) ."
+
+                rej_clause = ""
+                if rech_g_uris:
+                    uris = ", ".join(f"<{u}>" for u in rech_g_uris)
+                    rej_clause = f"FILTER NOT EXISTS {{ ?s mm:perteneceAGenero ?g . FILTER(?g IN ({uris})) }} ."
+
+                animo_uri = f"mm:{estado_animo}"
+
+                q_remote = f"""
+{PREFIXES}
+SELECT DISTINCT ?s ?titulo ?artista ?genero ?cal ?dur (GROUP_CONCAT(DISTINCT STR(?a); separator=\"|\") AS ?animos) (GROUP_CONCAT(DISTINCT STR(?c); separator=\"|\") AS ?contextos) WHERE {{
+  ?s rdf:type mm:Cancion .
+  OPTIONAL {{ ?s mm:titulo ?titulo }}
+  OPTIONAL {{ ?s mm:artista ?artista }}
+  OPTIONAL {{ ?s mm:perteneceAGenero ?genero }}
+  OPTIONAL {{ ?s mm:calificacion ?cal }}
+  OPTIONAL {{ ?s mm:duracion ?dur }}
+  OPTIONAL {{ ?s mm:aptoParaAnimo ?a }}
+  OPTIONAL {{ ?s mm:aptoParaContexto ?c }}
+  {rej_clause}
+  {excl_clause}
+  BIND(IF(EXISTS {{ ?s mm:aptoParaContexto mm:{contexto} }}, 10, 0) AS ?ctxScore)
+  BIND(IF(EXISTS {{ ?s mm:aptoParaAnimo {animo_uri} }}, 0, -1000) AS ?animoPenalty)
+  BIND({fav_genre_score_expr} AS ?favGenreScore)
+  BIND({fav_artist_score_expr} AS ?favArtistScore)
+  BIND(COALESCE(xsd:decimal(?cal), 0) * 0.5 AS ?calScore)
+  BIND(RAND() * 1.5 AS ?randScore)
+  BIND((?ctxScore + ?favGenreScore + ?favArtistScore + ?calScore + ?randScore + ?animoPenalty) AS ?score)
+}}
+ORDER BY DESC(?score)
+LIMIT {limite}
+"""
+
+                data = self._execute_sparql(q_remote)
+                bindings = data.get("results", {}).get("bindings", []) if data else []
+                for row in bindings:
+                    uri = row.get("s", {}).get("value")
+                    if not uri:
+                        continue
+                    local = str(uri).split('#')[-1]
+                    titulo = row.get("titulo", {}).get("value", "") if row.get("titulo") else ""
+                    artista = row.get("artista", {}).get("value", "") if row.get("artista") else ""
+                    genero_uri = row.get("genero", {}).get("value") if row.get("genero") else None
+                    genero = str(genero_uri).split('#')[-1] if genero_uri else ""
+                    cal = float(row.get("cal", {}).get("value", 0)) if row.get("cal") else 0.0
+                    dur = row.get("dur", {}).get("value", "") if row.get("dur") else ""
+                    animos_raw = row.get("animos", {}).get("value", "") if row.get("animos") else ""
+                    contextos_raw = row.get("contextos", {}).get("value", "") if row.get("contextos") else ""
+                    animos = [str(x).split("#")[-1] for x in animos_raw.split("|") if x]
+                    contextos = [str(x).split("#")[-1] for x in contextos_raw.split("|") if x]
+                    c = {
+                        "id": local,
+                        "uri": uri,
+                        "titulo": titulo,
+                        "artista": artista,
+                        "genero": genero,
+                        "calificacion": cal,
+                        "duracion": dur,
+                        "animos": animos,
+                        "contextos": contextos,
+                    }
+                    # Decide which level it belongs to: context match -> nivel1,
+                    # animo match only -> nivel2, otherwise nivel3
+                    if contexto in contextos:
+                        nivel1.append((_score(c, True), c))
+                    elif estado_animo in animos:
+                        nivel2.append((_score(c, False), c))
+                    else:
+                        nivel3.append((_score(c, False), c))
+            except Exception:
+                # Fall back to local approach on any remote failure
+                nivel1_songs = self._query_songs_with_metadata(animo=estado_animo, ctx=contexto, limit=300, rech_g_uris=rech_g_uris, excluidas_uris=excluidas_uris)
+                nivel2_songs = self._query_songs_with_metadata(animo=estado_animo, ctx=None, limit=500, rech_g_uris=rech_g_uris, excluidas_uris=excluidas_uris)
+                nivel3_songs = self._query_songs_with_metadata(animo=None, ctx=None, limit=1000, rech_g_uris=rech_g_uris, excluidas_uris=excluidas_uris)
+                seen = set()
+                for c in nivel1_songs:
+                    if c['id'] in seen:
+                        continue
+                    if c['id'] in excluidas:
+                        continue
+                    if c.get('genero') in rech_g:
+                        continue
+                    seen.add(c['id'])
+                    nivel1.append((_score(c, True), c))
+                for c in nivel2_songs:
+                    if c['id'] in seen:
+                        continue
+                    if c['id'] in excluidas:
+                        continue
+                    if c.get('genero') in rech_g:
+                        continue
+                    if estado_animo in c.get('animos', []):
+                        seen.add(c['id'])
+                        nivel2.append((_score(c, False), c))
+                for c in nivel3_songs:
+                    if c['id'] in seen:
+                        continue
+                    if c['id'] in excluidas:
+                        continue
+                    if c.get('genero') in rech_g:
+                        continue
+                    if estado_animo not in c.get('animos', []):
+                        seen.add(c['id'])
+                        nivel3.append((_score(c, False), c))
+        else:
+            # No SPARQL endpoint: keep previous behavior
+            nivel1_songs = self._query_songs_with_metadata(animo=estado_animo, ctx=contexto, limit=300, rech_g_uris=rech_g_uris, excluidas_uris=excluidas_uris)
+            nivel2_songs = self._query_songs_with_metadata(animo=estado_animo, ctx=None, limit=500, rech_g_uris=rech_g_uris, excluidas_uris=excluidas_uris)
+            nivel3_songs = self._query_songs_with_metadata(animo=None, ctx=None, limit=1000, rech_g_uris=rech_g_uris, excluidas_uris=excluidas_uris)
+            seen = set()
+            for c in nivel1_songs:
+                if c['id'] in seen:
+                    continue
+                if c['id'] in excluidas:
+                    continue
+                if c.get('genero') in rech_g:
+                    continue
                 seen.add(c['id'])
-                nivel2.append((_score(c, False), c))
-
-        for uri in nivel3_uris:
-            local = str(uri).split('#')[-1]
-            if local in seen:
-                continue
-            c = self._cancion_dict(g, uri)
-            if c['id'] in excluidas:
-                continue
-            if c['genero'] in rech_g:
-                continue
-            if estado_animo not in c.get('animos', []):
-                seen.add(c['id'])
-                nivel3.append((_score(c, False), c))
+                nivel1.append((_score(c, True), c))
+            for c in nivel2_songs:
+                if c['id'] in seen:
+                    continue
+                if c['id'] in excluidas:
+                    continue
+                if c.get('genero') in rech_g:
+                    continue
+                if estado_animo in c.get('animos', []):
+                    seen.add(c['id'])
+                    nivel2.append((_score(c, False), c))
+            for c in nivel3_songs:
+                if c['id'] in seen:
+                    continue
+                if c['id'] in excluidas:
+                    continue
+                if c.get('genero') in rech_g:
+                    continue
+                if estado_animo not in c.get('animos', []):
+                    seen.add(c['id'])
+                    nivel3.append((_score(c, False), c))
 
         for nivel in (nivel1, nivel2, nivel3):
             nivel.sort(key=lambda x: x[0], reverse=True)
@@ -242,12 +498,30 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     def recomendar_por_genero(self, genero: str, limite: int = 10) -> list:
         g = self._grafo()
         canciones = []
-        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
-            genero_uri = g.value(cancion_uri, MM.perteneceAGenero)
-            genero_local = str(genero_uri).split("#")[-1] if genero_uri else ""
-            if self._normalizar(genero_local) == self._normalizar(genero):
-                c = self._cancion_dict(g, cancion_uri)
-                canciones.append(c)
+        genero_esc = self._sparql_literal_escape(genero)
+        q = f"""
+{PREFIXES}
+SELECT DISTINCT ?s WHERE {{
+  ?s rdf:type mm:Cancion .
+  ?s mm:perteneceAGenero ?g .
+  FILTER(lcase(strafter(str(?g), "#")) = lcase("{genero_esc}")) .
+}} LIMIT {limite}
+"""
+        song_uris = None
+        if self._sparql_enabled():
+            try:
+                data = self._execute_sparql(q)
+                song_uris = [row["s"]["value"] for row in data.get("results", {}).get("bindings", []) if row.get("s")]
+            except Exception:
+                song_uris = None
+
+        if song_uris is None:
+            song_uris = [s for s in g.subjects(RDF.type, MM.Cancion)
+                         if self._normalizar(str(g.value(s, MM.perteneceAGenero) or "").split("#")[-1]) == self._normalizar(genero)]
+
+        for cancion_uri in song_uris:
+            c = self._cancion_dict(g, cancion_uri)
+            canciones.append(c)
         canciones.sort(key=lambda x: x["calificacion"], reverse=True)
         return canciones[:limite]
 
@@ -258,7 +532,25 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     def obtener_mejor_valoradas(self, limite: int = 5) -> list:
         g = self._grafo()
         canciones = []
-        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
+        q = f"""
+{PREFIXES}
+SELECT ?s ?cal WHERE {{
+  ?s rdf:type mm:Cancion .
+  ?s mm:calificacion ?cal .
+}} ORDER BY DESC(xsd:decimal(?cal)) LIMIT {limite}
+"""
+        song_uris = None
+        if self._sparql_enabled():
+            try:
+                data = self._execute_sparql(q)
+                song_uris = [row["s"]["value"] for row in data.get("results", {}).get("bindings", []) if row.get("s")]
+            except Exception:
+                song_uris = None
+
+        if song_uris is None:
+            song_uris = [s for s in g.subjects(RDF.type, MM.Cancion)]
+
+        for cancion_uri in song_uris:
             c = self._cancion_dict(g, cancion_uri)
             canciones.append(c)
         canciones.sort(key=lambda x: x["calificacion"], reverse=True)
@@ -272,6 +564,24 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         """Retorna los géneros que realmente tienen canciones en el grafo."""
         g = self._grafo()
         generos = set()
+        q = f"""
+{PREFIXES}
+SELECT DISTINCT ?genero WHERE {{
+  ?s rdf:type mm:Cancion .
+  ?s mm:perteneceAGenero ?genero .
+}}
+"""
+        if self._sparql_enabled():
+            try:
+                data = self._execute_sparql(q)
+                for row in data.get("results", {}).get("bindings", []):
+                    genero_uri = row.get("genero", {}).get("value")
+                    if genero_uri:
+                        generos.add(str(genero_uri).split("#")[-1])
+                return sorted(generos)
+            except Exception:
+                pass
+
         for cancion_uri in g.subjects(RDF.type, MM.Cancion):
             genero_uri = g.value(cancion_uri, MM.perteneceAGenero)
             if genero_uri:
@@ -330,11 +640,30 @@ PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         """Retorna todas las canciones de un artista en el grafo."""
         g = self._grafo()
         canciones = []
-        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
-            artista_grafo = str(g.value(cancion_uri, MM.artista) or "")
-            if artista_grafo.lower() == artista.lower():
-                c = self._cancion_dict(g, cancion_uri)
-                canciones.append(c)
+        artista_esc = self._sparql_literal_escape(artista)
+        q = f"""
+{PREFIXES}
+SELECT DISTINCT ?s WHERE {{
+  ?s rdf:type mm:Cancion .
+  ?s mm:artista ?a .
+  FILTER(lcase(str(?a)) = lcase("{artista_esc}")) .
+}} LIMIT {limite}
+"""
+        song_uris = None
+        if self._sparql_enabled():
+            try:
+                data = self._execute_sparql(q)
+                song_uris = [row["s"]["value"] for row in data.get("results", {}).get("bindings", []) if row.get("s")]
+            except Exception:
+                song_uris = None
+
+        if song_uris is None:
+            song_uris = [s for s in g.subjects(RDF.type, MM.Cancion)
+                         if str(g.value(s, MM.artista) or "").lower() == artista.lower()]
+
+        for cancion_uri in song_uris:
+            c = self._cancion_dict(g, cancion_uri)
+            canciones.append(c)
         canciones.sort(key=lambda x: x["calificacion"], reverse=True)
         return canciones[:limite]
 

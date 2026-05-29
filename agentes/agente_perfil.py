@@ -6,6 +6,12 @@ from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, XSD
 import os
 import threading
+try:
+    from SPARQLWrapper import SPARQLWrapper, JSON
+    _HAS_SPARQLWRAPPER = True
+except Exception:
+    SPARQLWrapper = None
+    _HAS_SPARQLWRAPPER = False
 
 MM = Namespace("http://www.semanticweb.org/moodmusic#")
 
@@ -29,6 +35,18 @@ class AgentePerfilUsuario:
 
     def __init__(self):
         self.grafo_path = GRAFO_PATH
+        self.sparql_endpoint = os.environ.get("SPARQL_ENDPOINT") or os.environ.get("FUSEKI_ENDPOINT")
+        if self.sparql_endpoint and not _HAS_SPARQLWRAPPER:
+            raise RuntimeError("SPARQL endpoint configurado pero falta la dependencia SPARQLWrapper. Instala SPARQLWrapper.")
+
+    def _sparql_enabled(self):
+        return bool(self.sparql_endpoint)
+
+    def _execute_sparql(self, query):
+        sparql = SPARQLWrapper(self.sparql_endpoint)
+        sparql.setQuery(query)
+        sparql.setReturnFormat(JSON)
+        return sparql.query().convert()
 
     # ──────────────────────────────────────────────
     # Carga y guardado
@@ -81,18 +99,45 @@ class AgentePerfilUsuario:
         GROUP BY ?estado ?ctx
         """
 
-        res = g.query(q, initBindings={"u": u})
-
         estado_animo = ""
         contexto = ""
         likes_raw = ""
         nolikes_raw = ""
-        for row in res:
-            estado_animo = self._local(row[0]) if row[0] is not None else ""
-            contexto = self._local(row[1]) if row[1] is not None else ""
-            likes_raw = str(row[2]) if row[2] is not None else ""
-            nolikes_raw = str(row[3]) if row[3] is not None else ""
-            break
+
+        if self._sparql_enabled():
+            try:
+                u_uri = str(u)
+                q_remote = f"""
+        PREFIX mm: <http://www.semanticweb.org/moodmusic#>
+        SELECT ?estado ?ctx (GROUP_CONCAT(DISTINCT STR(?lg); separator=\"|\") AS ?likes) (GROUP_CONCAT(DISTINCT STR(?nl); separator=\"|\") AS ?nolikes)
+        WHERE {{
+          BIND(<{u_uri}> AS ?u)
+          OPTIONAL {{ ?u mm:tieneEstadoDeAnimo ?estado. }}
+          OPTIONAL {{ ?u mm:estaEnContexto ?ctx. }}
+          OPTIONAL {{ ?u mm:leGusta ?lg. }}
+          OPTIONAL {{ ?u mm:noLeGusta ?nl. }}
+        }}
+        GROUP BY ?estado ?ctx
+                """
+                data = self._execute_sparql(q_remote)
+                bindings = data.get("results", {}).get("bindings", []) if data else []
+                if bindings:
+                    row = bindings[0]
+                    estado_animo = self._local(row.get("estado", {}).get("value")) if row.get("estado") else ""
+                    contexto = self._local(row.get("ctx", {}).get("value")) if row.get("ctx") else ""
+                    likes_raw = row.get("likes", {}).get("value", "") if row.get("likes") else ""
+                    nolikes_raw = row.get("nolikes", {}).get("value", "") if row.get("nolikes") else ""
+            except Exception:
+                pass
+
+        if not estado_animo and not contexto and not likes_raw and not nolikes_raw:
+            res = g.query(q, initBindings={"u": u})
+            for row in res:
+                estado_animo = self._local(row[0]) if row[0] is not None else ""
+                contexto = self._local(row[1]) if row[1] is not None else ""
+                likes_raw = str(row[2]) if row[2] is not None else ""
+                nolikes_raw = str(row[3]) if row[3] is not None else ""
+                break
 
         def _parse_uri_list(s):
             if not s:

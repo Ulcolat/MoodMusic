@@ -6,10 +6,79 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from agentes.agente_perfil import AgentePerfilUsuario
 from agentes.agente_recomendacion import AgenteRecomendacion
 import os
+from urllib import error, parse, request as urlrequest
 
 # ==================== CONFIGURACIÓN ====================
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "moodmusic_dev_key")
+
+FUSEKI_HOST = os.environ.get("FUSEKI_HOST")
+FUSEKI_DATASET = os.environ.get("FUSEKI_DATASET", "moodmusic")
+AUTO_LOAD_FUSEKI = os.environ.get("AUTO_LOAD_FUSEKI")
+
+if not FUSEKI_HOST:
+    sparql_endpoint = os.environ.get("SPARQL_ENDPOINT") or os.environ.get("FUSEKI_ENDPOINT")
+    if sparql_endpoint:
+        parsed = parse.urlparse(sparql_endpoint)
+        parts = parsed.path.strip("/").split("/")
+        if len(parts) >= 2 and parts[-1].lower() == "query":
+            FUSEKI_HOST = f"{parsed.scheme}://{parsed.netloc}"
+            FUSEKI_DATASET = FUSEKI_DATASET or parts[-2]
+
+if FUSEKI_HOST and not os.environ.get("SPARQL_ENDPOINT") and not os.environ.get("FUSEKI_ENDPOINT"):
+    os.environ["SPARQL_ENDPOINT"] = f"{FUSEKI_HOST.rstrip('/')}/{FUSEKI_DATASET}/query"
+
+if AUTO_LOAD_FUSEKI is None:
+    AUTO_LOAD_FUSEKI = bool(FUSEKI_HOST)
+else:
+    AUTO_LOAD_FUSEKI = AUTO_LOAD_FUSEKI.lower() in ("1", "true", "yes")
+
+
+def _fuseki_url(path: str) -> str:
+    return f"{FUSEKI_HOST.rstrip('/')}/{path.lstrip('/')}"
+
+
+def _create_fuseki_dataset() -> None:
+    create_url = _fuseki_url("$/datasets")
+    data = parse.urlencode({"dbName": FUSEKI_DATASET, "dbType": "mem"}).encode("utf-8")
+    req = urlrequest.Request(create_url, data=data, headers={"Content-Type": "application/x-www-form-urlencoded"})
+    try:
+        with urlrequest.urlopen(req, timeout=20) as resp:
+            if resp.status in (200, 201, 202):
+                print(f"[Fuseki] Dataset '{FUSEKI_DATASET}' creado o ya existente.")
+    except error.HTTPError as exc:
+        if exc.code == 400:
+            print(f"[Fuseki] Dataset '{FUSEKI_DATASET}' ya existe.")
+        else:
+            print(f"[Fuseki] Error creando dataset: {exc}")
+    except Exception as exc:
+        print(f"[Fuseki] Error creando dataset: {exc}")
+
+
+def _upload_grafo_to_fuseki() -> None:
+    upload_url = _fuseki_url(f"{FUSEKI_DATASET}/data")
+    ttl_path = os.path.join(os.path.dirname(__file__), "datos", "grafo.ttl")
+    if not os.path.exists(ttl_path):
+        print(f"[Fuseki] No se encontró {ttl_path}")
+        return
+    try:
+        with open(ttl_path, "rb") as f:
+            body = f.read()
+        req = urlrequest.Request(upload_url, data=body, headers={"Content-Type": "text/turtle"})
+        with urlrequest.urlopen(req, timeout=120) as resp:
+            print(f"[Fuseki] Grafo subido correctamente a '{upload_url}' ({resp.status}).")
+    except error.HTTPError as exc:
+        print(f"[Fuseki] Error subiendo grafo: {exc.code} {exc.reason}")
+    except Exception as exc:
+        print(f"[Fuseki] Error subiendo grafo: {exc}")
+
+
+def _ensure_fuseki_graph_loaded() -> None:
+    if not AUTO_LOAD_FUSEKI or not FUSEKI_HOST or not FUSEKI_DATASET:
+        return
+    print(f"[Fuseki] Auto-carga habilitada: host={FUSEKI_HOST}, dataset={FUSEKI_DATASET}")
+    _create_fuseki_dataset()
+    _upload_grafo_to_fuseki()
 
 agente_perfil = AgentePerfilUsuario()
 agente_recomendacion = AgenteRecomendacion()
@@ -272,4 +341,5 @@ def quitar_no_gusta():
 # ARRANQUE
 # ──────────────────────────────────────────────
 if __name__ == "__main__":
+    _ensure_fuseki_graph_loaded()
     app.run(debug=True)

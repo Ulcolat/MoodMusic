@@ -1,0 +1,3 @@
+Flask
+rdflib>=6.0.0
+SPARQLWrapper>=1.8.5

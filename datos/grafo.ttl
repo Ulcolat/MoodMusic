@@ -334,15 +334,6 @@ mm:C_About_A_Girl_Live_Nirvana a mm:Cancion ;
     mm:perteneceAGenero mm:Rock ;
     mm:titulo "About A Girl (Live)"^^xsd:string .
 
-mm:C_About_A_Girl_Nirvana a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Nirvana"^^xsd:string ;
-    mm:calificacion "3.6"^^xsd:float ;
-    mm:duracion "2:46"^^xsd:string ;
-    mm:perteneceAGenero mm:Rock ;
-    mm:titulo "About A Girl"^^xsd:string .
-
 mm:C_Acróstico_Milan__Sasha_Shakira a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -2134,15 +2125,6 @@ mm:C_Come_As_You_Are_Live_Nirvana a mm:Cancion ;
     mm:perteneceAGenero mm:Rock ;
     mm:titulo "Come As You Are (Live)"^^xsd:string .
 
-mm:C_Come_As_You_Are_Nirvana a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Nirvana"^^xsd:string ;
-    mm:calificacion "4.8"^^xsd:float ;
-    mm:duracion "3:38"^^xsd:string ;
-    mm:perteneceAGenero mm:Rock ;
-    mm:titulo "Come As You Are"^^xsd:string .
-
 mm:C_Come_Fly_With_Me_2008_Remastered_Frank_Sinatra a mm:Cancion ;
     mm:aptoParaAnimo mm:Romantico ;
     mm:aptoParaContexto mm:Casa ;
@@ -3213,15 +3195,6 @@ mm:C_El_Cielo_Sky a mm:Cancion ;
     mm:duracion "3:11"^^xsd:string ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "El Cielo"^^xsd:string .
-
-mm:C_El_Día_De_Mi_Suerte_Willie_Colón a mm:Cancion ;
-    mm:aptoParaAnimo mm:Alegre ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Willie Colón"^^xsd:string ;
-    mm:calificacion "2.9"^^xsd:float ;
-    mm:duracion "5:23"^^xsd:string ;
-    mm:perteneceAGenero mm:Salsa ;
-    mm:titulo "El Día De Mi Suerte"^^xsd:string .
 
 mm:C_El_Efecto_Rauw_Alejandro a mm:Cancion ;
     mm:aptoParaAnimo mm:Romantico ;
@@ -6165,15 +6138,6 @@ mm:C_Like_Toy_Soldiers_Eminem a mm:Cancion ;
     mm:duracion "4:57"^^xsd:string ;
     mm:perteneceAGenero mm:HipHop ;
     mm:titulo "Like Toy Soldiers"^^xsd:string .
-
-mm:C_Lithium_Nirvana a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Nirvana"^^xsd:string ;
-    mm:calificacion "4.3"^^xsd:float ;
-    mm:duracion "4:15"^^xsd:string ;
-    mm:perteneceAGenero mm:Rock ;
-    mm:titulo "Lithium"^^xsd:string .
 
 mm:C_Little_Demon_Anuel_AA a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
@@ -10846,15 +10810,6 @@ mm:C_Start_A_Fire_John_Legend a mm:Cancion ;
     mm:perteneceAGenero mm:RnB ;
     mm:titulo "Start A Fire"^^xsd:string .
 
-mm:C_Stay_Away_Nirvana a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Nirvana"^^xsd:string ;
-    mm:calificacion "3.2"^^xsd:float ;
-    mm:duracion "3:31"^^xsd:string ;
-    mm:perteneceAGenero mm:Rock ;
-    mm:titulo "Stay Away"^^xsd:string .
-
 mm:C_Stay_With_Me_Calvin_Harris a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -12114,15 +12069,6 @@ mm:C_Try_Everything_Shakira a mm:Cancion ;
     mm:duracion "3:16"^^xsd:string ;
     mm:perteneceAGenero mm:Latin ;
     mm:titulo "Try Everything"^^xsd:string .
-
-mm:C_Tu_Amor_Me_Hace_Bien_Salsa_Version_Marc_Anthony a mm:Cancion ;
-    mm:aptoParaAnimo mm:Alegre ;
-    mm:aptoParaContexto mm:Fiesta ;
-    mm:artista "Marc Anthony"^^xsd:string ;
-    mm:calificacion "2.6"^^xsd:float ;
-    mm:duracion "5:00"^^xsd:string ;
-    mm:perteneceAGenero mm:Salsa ;
-    mm:titulo "Tu Amor Me Hace Bien Salsa Version"^^xsd:string .
 
 mm:C_Tu_Vida_en_la_Mía_Marc_Anthony a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
@@ -13879,15 +13825,6 @@ mm:C_un_x100to_Grupo_Frontera a mm:Cancion ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "un x100to"^^xsd:string .
 
-mm:C_vampire_Olivia_Rodrigo a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Olivia Rodrigo"^^xsd:string ;
-    mm:calificacion "4.6"^^xsd:float ;
-    mm:duracion "3:40"^^xsd:string ;
-    mm:perteneceAGenero mm:Pop ;
-    mm:titulo "vampire"^^xsd:string .
-
 mm:C_we_cant_be_friends_wait_for_your_love_Ariana_Grande a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -13933,6 +13870,18 @@ mm:C_寒意_放松的节拍 a mm:Cancion ;
     mm:perteneceAGenero mm:LoFi ;
     mm:titulo "寒意"^^xsd:string .
 
+mm:duban123 a mm:Usuario ;
+    mm:email "duban_blanco82221@elpoli.edu.co"^^xsd:string ;
+    mm:estaEnContexto mm:Fiesta ;
+    mm:leGusta mm:C_About_A_Girl_Nirvana,
+        mm:C_Come_As_You_Are_Nirvana,
+        mm:C_Lithium_Nirvana,
+        mm:C_Stay_Away_Nirvana ;
+    mm:noLeGusta mm:C_Rape_Me_Nirvana,
+        mm:C_vampire_Olivia_Rodrigo ;
+    mm:nombre "Yair"^^xsd:string ;
+    mm:tieneEstadoDeAnimo mm:Triste .
+
 mm:usuario123 a mm:Usuario ;
     mm:email "dubanblanco123@gmail.com"^^xsd:string ;
     mm:estaEnContexto mm:Gaming ;
@@ -13941,6 +13890,7 @@ mm:usuario123 a mm:Usuario ;
         mm:C_Como_en_el_Idilio_Marc_Anthony,
         mm:C_DtMF_Bad_Bunny,
         mm:C_DÁKITI_Bad_Bunny,
+        mm:C_El_Día_De_Mi_Suerte_Willie_Colón,
         mm:C_Hasta_Abajo_Don_Omar,
         mm:C_LUNA_Feid,
         mm:C_La_Murga_Willie_Colón,
@@ -13950,6 +13900,7 @@ mm:usuario123 a mm:Usuario ;
         mm:C_SORRY_4_THAT_MUCH_Feid,
         mm:C_Si_Antes_Te_Hubiera_Conocido_KAROL_G,
         mm:C_Tití_Me_Preguntó_Bad_Bunny,
+        mm:C_Tu_Amor_Me_Hace_Bien_Salsa_Version_Marc_Anthony,
         mm:C_VOY_A_LLeVARTE_PA_PR_Bad_Bunny,
         mm:C_Yo_Perreo_Sola_Bad_Bunny ;
     mm:noLeGusta mm:C_About_You_The_1975,
@@ -13960,7 +13911,16 @@ mm:usuario123 a mm:Usuario ;
         mm:C_Stargirl_Interlude_The_Weeknd,
         mm:C_Theme_From_New_York_New_York_2008_Remastered_Frank_Sinatra ;
     mm:nombre "Duban"^^xsd:string ;
-    mm:tieneEstadoDeAnimo mm:Tranquilo .
+    mm:tieneEstadoDeAnimo mm:Alegre .
+
+mm:C_About_A_Girl_Nirvana a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Nirvana"^^xsd:string ;
+    mm:calificacion "3.6"^^xsd:float ;
+    mm:duracion "2:46"^^xsd:string ;
+    mm:perteneceAGenero mm:Rock ;
+    mm:titulo "About A Girl"^^xsd:string .
 
 mm:C_About_You_The_1975 a mm:Cancion ;
     mm:aptoParaAnimo mm:Triste ;
@@ -13988,6 +13948,15 @@ mm:C_Ché_Ché_Colé_Willie_Colón a mm:Cancion ;
     mm:duracion "3:29"^^xsd:string ;
     mm:perteneceAGenero mm:Salsa ;
     mm:titulo "Ché Ché Colé"^^xsd:string .
+
+mm:C_Come_As_You_Are_Nirvana a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Nirvana"^^xsd:string ;
+    mm:calificacion "4.8"^^xsd:float ;
+    mm:duracion "3:38"^^xsd:string ;
+    mm:perteneceAGenero mm:Rock ;
+    mm:titulo "Come As You Are"^^xsd:string .
 
 mm:C_Como_en_el_Idilio_Marc_Anthony a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
@@ -14034,6 +14003,15 @@ mm:C_Easy_On_Me_Adele a mm:Cancion ;
     mm:perteneceAGenero mm:Pop ;
     mm:titulo "Easy On Me"^^xsd:string .
 
+mm:C_El_Día_De_Mi_Suerte_Willie_Colón a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Willie Colón"^^xsd:string ;
+    mm:calificacion "2.9"^^xsd:float ;
+    mm:duracion "5:23"^^xsd:string ;
+    mm:perteneceAGenero mm:Salsa ;
+    mm:titulo "El Día De Mi Suerte"^^xsd:string .
+
 mm:C_Hasta_Abajo_Don_Omar a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -14079,6 +14057,15 @@ mm:C_La_Vida_Es_Un_Carnaval_Celia_Cruz a mm:Cancion ;
     mm:perteneceAGenero mm:Salsa ;
     mm:titulo "La Vida Es Un Carnaval"^^xsd:string .
 
+mm:C_Lithium_Nirvana a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Nirvana"^^xsd:string ;
+    mm:calificacion "4.3"^^xsd:float ;
+    mm:duracion "4:15"^^xsd:string ;
+    mm:perteneceAGenero mm:Rock ;
+    mm:titulo "Lithium"^^xsd:string .
+
 mm:C_Oye_Cómo_Va_Celia_Cruz a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -14096,15 +14083,6 @@ mm:C_PERRO_NEGRO_Bad_Bunny a mm:Cancion ;
     mm:duracion "2:42"^^xsd:string ;
     mm:perteneceAGenero mm:Reggaeton ;
     mm:titulo "PERRO NEGRO"^^xsd:string .
-
-mm:C_Rape_Me_Nirvana a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Nirvana"^^xsd:string ;
-    mm:calificacion "3.7"^^xsd:float ;
-    mm:duracion "2:50"^^xsd:string ;
-    mm:perteneceAGenero mm:Rock ;
-    mm:titulo "Rape Me"^^xsd:string .
 
 mm:C_SORRY_4_THAT_MUCH_Feid a mm:Cancion ;
     mm:aptoParaAnimo mm:Tranquilo ;
@@ -14133,6 +14111,15 @@ mm:C_Stargirl_Interlude_The_Weeknd a mm:Cancion ;
     mm:perteneceAGenero mm:RnB ;
     mm:titulo "Stargirl Interlude"^^xsd:string .
 
+mm:C_Stay_Away_Nirvana a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Nirvana"^^xsd:string ;
+    mm:calificacion "3.2"^^xsd:float ;
+    mm:duracion "3:31"^^xsd:string ;
+    mm:perteneceAGenero mm:Rock ;
+    mm:titulo "Stay Away"^^xsd:string .
+
 mm:C_Theme_From_New_York_New_York_2008_Remastered_Frank_Sinatra a mm:Cancion ;
     mm:aptoParaAnimo mm:Romantico ;
     mm:aptoParaContexto mm:Casa ;
@@ -14151,6 +14138,15 @@ mm:C_Tití_Me_Preguntó_Bad_Bunny a mm:Cancion ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "Tití Me Preguntó"^^xsd:string .
 
+mm:C_Tu_Amor_Me_Hace_Bien_Salsa_Version_Marc_Anthony a mm:Cancion ;
+    mm:aptoParaAnimo mm:Alegre ;
+    mm:aptoParaContexto mm:Fiesta ;
+    mm:artista "Marc Anthony"^^xsd:string ;
+    mm:calificacion "2.6"^^xsd:float ;
+    mm:duracion "5:00"^^xsd:string ;
+    mm:perteneceAGenero mm:Salsa ;
+    mm:titulo "Tu Amor Me Hace Bien Salsa Version"^^xsd:string .
+
 mm:C_VOY_A_LLeVARTE_PA_PR_Bad_Bunny a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -14168,6 +14164,24 @@ mm:C_Yo_Perreo_Sola_Bad_Bunny a mm:Cancion ;
     mm:duracion "2:52"^^xsd:string ;
     mm:perteneceAGenero mm:Reggaeton ;
     mm:titulo "Yo Perreo Sola"^^xsd:string .
+
+mm:C_vampire_Olivia_Rodrigo a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Olivia Rodrigo"^^xsd:string ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:40"^^xsd:string ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "vampire"^^xsd:string .
+
+mm:C_Rape_Me_Nirvana a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Nirvana"^^xsd:string ;
+    mm:calificacion "3.7"^^xsd:float ;
+    mm:duracion "2:50"^^xsd:string ;
+    mm:perteneceAGenero mm:Rock ;
+    mm:titulo "Rape Me"^^xsd:string .
 
 mm:Latin a mm:Genero .
 
