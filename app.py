@@ -183,12 +183,10 @@ def perfil():
 
     usuario_id = obtener_usuario_sesion()
     perfil_data = agente_perfil.obtener_perfil(usuario_id)
-    generos = _generos()
     return render_template(
         "perfil.html",
         perfil=perfil_data,
         nombre=session.get("nombre"),
-        generos=generos,
         estados_animo=ESTADOS_ANIMO,
         contextos=CONTEXTOS,
     )
@@ -207,6 +205,67 @@ def preview(titulo, artista):
     if preview_url:
         return jsonify({"preview_url": preview_url})
     return jsonify({"error": "Preview no disponible"}), 404
+
+@app.route("/artista/<nombre_artista>")
+def artista(nombre_artista):
+    """Muestra información y canciones de un artista."""
+    if not usuario_autenticado():
+        return redirect(url_for("login"))
+
+    # Nota: usa la INSTANCIA, no la clase
+    info = agente_recomendacion.buscar_info_artista(nombre_artista)
+
+    return render_template(
+        "artista.html",
+        artista=info,
+        nombre=session.get("nombre")
+    )
+
+@app.route("/genero/<nombre_genero>")
+def genero(nombre_genero):
+    """Vista de género con todas sus canciones."""
+    if not usuario_autenticado():
+        return redirect(url_for("login"))
+
+    canciones = agente_recomendacion.recomendar_por_genero(nombre_genero, limite=50)
+
+    return render_template(
+        "genero.html",
+        genero=nombre_genero,
+        canciones=canciones,
+        nombre=session.get("nombre"),
+    )
+
+
+@app.route("/quitar_favorita", methods=["POST"])
+def quitar_favorita():
+    """Quita una canción de favoritas."""
+    if not usuario_autenticado():
+        return jsonify({"error": "No autenticado"}), 401
+
+    usuario_id = obtener_usuario_sesion()
+    cancion_id = request.form.get("cancion_id", "").strip()
+    if not cancion_id:
+        return jsonify({"error": "Canción no especificada."}), 400
+
+    agente_perfil.quitar_cancion_gustada(usuario_id, cancion_id)
+    return jsonify({"mensaje": "Canción quitada de favoritas."})
+
+
+@app.route("/quitar_no_gusta", methods=["POST"])
+def quitar_no_gusta():
+    """Quita una canción de no me gustan."""
+    if not usuario_autenticado():
+        return jsonify({"error": "No autenticado"}), 401
+
+    usuario_id = obtener_usuario_sesion()
+    cancion_id = request.form.get("cancion_id", "").strip()
+    if not cancion_id:
+        return jsonify({"error": "Canción no especificada."}), 400
+
+    agente_perfil.quitar_cancion_no_gustada(usuario_id, cancion_id)
+    return jsonify({"mensaje": "Canción quitada de no me gustan."})
+
 
 
 # ──────────────────────────────────────────────

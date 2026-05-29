@@ -229,3 +229,82 @@ class AgenteRecomendacion:
             return None
         except Exception:
             return None
+
+    # ──────────────────────────────────────────────
+    # Canciones por artista
+    # ──────────────────────────────────────────────
+
+    def canciones_por_artista(self, artista: str, limite: int = 50) -> list:
+        """Retorna todas las canciones de un artista en el grafo."""
+        g = self._grafo()
+        canciones = []
+        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
+            artista_grafo = str(g.value(cancion_uri, MM.artista) or "")
+            if artista_grafo.lower() == artista.lower():
+                c = self._cancion_dict(g, cancion_uri)
+                canciones.append(c)
+        canciones.sort(key=lambda x: x["calificacion"], reverse=True)
+        return canciones[:limite]
+
+    # ──────────────────────────────────────────────
+    # Info del artista
+    # ──────────────────────────────────────────────
+
+    def buscar_info_artista(self, nombre_artista: str) -> dict:
+        """
+        Busca canciones del artista en el grafo RDF y enriquece con
+        foto y bio desde la API de Deezer.
+        """
+        canciones = self.canciones_por_artista(nombre_artista)
+        foto, bio, seguidores, nb_fans = None, None, None, None
+
+        try:
+            query = urllib.parse.quote(nombre_artista)
+            url = f"https://api.deezer.com/search/artist?q={query}&limit=5"
+            with urllib.request.urlopen(url, timeout=6) as r:
+                data = json.loads(r.read())
+            results = data.get("data", [])
+            # Buscar coincidencia exacta (case-insensitive)
+            artista_obj = None
+            for item in results:
+                if item.get("name", "").lower() == nombre_artista.lower():
+                    artista_obj = item
+                    break
+            if artista_obj is None and results:
+                artista_obj = results[0]
+
+            if artista_obj:
+                artista_id = artista_obj.get("id")
+                foto = artista_obj.get("picture_xl") or artista_obj.get("picture_big") or artista_obj.get("picture")
+                nb_fans = artista_obj.get("nb_fan")
+
+                # Obtener bio desde endpoint de detalle del artista
+                if artista_id:
+                    detail_url = f"https://api.deezer.com/artist/{artista_id}"
+                    with urllib.request.urlopen(detail_url, timeout=6) as r2:
+                        detail = json.loads(r2.read())
+                    # Deezer no da bio directamente, pero sí nb_fan y tracklist count
+                    nb_fans = detail.get("nb_fan", nb_fans)
+                    # Generar bio básica con datos disponibles
+                    nb_album = detail.get("nb_album", 0)
+                    radio = detail.get("radio", False)
+                    bio = f"{nombre_artista} tiene {nb_fans:,} seguidores en Deezer y {nb_album} álbumes disponibles." if nb_fans else None
+        except Exception:
+            pass
+
+        # Contar géneros para mostrar estadísticas
+        generos_conteo = {}
+        for c in canciones:
+            g = c.get("genero", "")
+            if g:
+                generos_conteo[g] = generos_conteo.get(g, 0) + 1
+        generos_top = sorted(generos_conteo.items(), key=lambda x: x[1], reverse=True)
+
+        return {
+            "nombre": nombre_artista,
+            "foto": foto,
+            "bio": bio,
+            "nb_fans": nb_fans,
+            "generos": generos_top,
+            "canciones": canciones,
+        }

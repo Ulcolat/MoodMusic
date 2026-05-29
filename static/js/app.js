@@ -149,6 +149,64 @@ function reaccion(cancionId, tipo, btn) {
 }
 
 // ──────────────────────────────────────────────
+// MOVER CANCIONES EN PERFIL
+// ──────────────────────────────────────────────
+
+async function moverCancion(cancionId, accion, btn) {
+    const card = btn.closest('.song-card');
+    let endpoint = '';
+
+    if (accion === 'quitar_fav') {
+        endpoint = '/quitar_favorita';
+    } else if (accion === 'quitar_nope') {
+        endpoint = '/quitar_no_gusta';
+    } else if (accion === 'fav_a_nope') {
+        // Quitar de favoritas y agregar a no me gustan
+        const fd1 = new FormData();
+        fd1.append('cancion_id', cancionId);
+        await fetch('/quitar_favorita', { method: 'POST', body: fd1 });
+        const fd2 = new FormData();
+        fd2.append('cancion_id', cancionId);
+        await fetch('/no_me_gusta', { method: 'POST', body: fd2 });
+        animarSalida(card);
+        showToast('Movida a no me gustan.');
+        return;
+    } else if (accion === 'nope_a_fav') {
+        // Quitar de no me gustan y agregar a favoritas
+        const fd1 = new FormData();
+        fd1.append('cancion_id', cancionId);
+        await fetch('/quitar_no_gusta', { method: 'POST', body: fd1 });
+        const fd2 = new FormData();
+        fd2.append('cancion_id', cancionId);
+        await fetch('/me_gusta', { method: 'POST', body: fd2 });
+        animarSalida(card);
+        showToast('Movida a favoritas ♥');
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append('cancion_id', cancionId);
+
+    try {
+        const res = await fetch(endpoint, { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.error) { showToast('⚠ ' + data.error); return; }
+        animarSalida(card);
+        showToast('Canción actualizada.');
+    } catch {
+        showToast('Error al actualizar canción.');
+    }
+}
+
+function animarSalida(el) {
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transform = 'scale(0.95)';
+    el.style.transition = 'all 0.25s ease';
+    setTimeout(() => el.remove(), 260);
+}
+
+// ──────────────────────────────────────────────
 // EXPLORAR POR GÉNERO
 // ──────────────────────────────────────────────
 const genreTabs  = document.getElementById('genreTabs');

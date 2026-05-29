@@ -1,4 +1,4 @@
-<div class="song-card" data-id="{{ cancion.id }}" data-titulo="{{ cancion.titulo }}" data-artista="{{ cancion.artista }}">
+<div class="song-card" data-id="{{ cancion.id }}">
   <div class="song-meta">
     <div class="song-cover">🎵</div>
     <div>
@@ -12,6 +12,11 @@
   <div class="song-actions">
     <span class="song-rating">★ {{ "%.1f"|format(cancion.calificacion) }}</span>
     <span class="song-duration">{{ cancion.duracion }}</span>
-    <button class="btn-icon btn-play-song" title="Reproducir" onclick="playSong('{{ cancion.titulo }}','{{ cancion.artista }}','{{ cancion.titulo }}','{{ cancion.artista }}')">▶</button>
+    <button class="btn-icon btn-play-song" title="Reproducir"
+      onclick="playSong('{{ cancion.titulo|replace("'", "\\'") }}','{{ cancion.artista|replace("'", "\\'") }}')">▶</button>
+    <button class="btn-icon btn-like" title="Me gusta"
+      onclick="reaccion('{{ cancion.id }}','like',this)">♥</button>
+    <button class="btn-icon btn-dislike" title="No me gusta"
+      onclick="reaccion('{{ cancion.id }}','dislike',this)">✕</button>
   </div>
 </div>

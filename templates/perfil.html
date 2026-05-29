@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,12 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
+
 <body>
   <nav class="navbar">
     <div class="nav-brand">
       <svg class="nav-logo" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="18" fill="rgba(124,58,237,0.3)"/>
-        <path d="M14 28V13l16 7.5L14 28z" fill="#a78bfa"/>
+        <circle cx="20" cy="20" r="18" fill="rgba(124,58,237,0.3)" />
+        <path d="M14 28V13l16 7.5L14 28z" fill="#a78bfa" />
       </svg>
       MoodMusic
     </div>
@@ -67,70 +69,126 @@
             <div class="stat-label">Géneros fav.</div>
           </div>
         </div>
-
-        {% if perfil.generos_favoritos %}
-        <h4 class="mini-title">Géneros favoritos</h4>
-        <div class="tag-list">
-          {% for g in perfil.generos_favoritos %}
-          <span class="tag tag-genre">{{ g }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if perfil.artistas_favoritos %}
-        <h4 class="mini-title">Artistas favoritos</h4>
-        <div class="tag-list">
-          {% for a in perfil.artistas_favoritos %}
-          <span class="tag tag-artist">{{ a }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if perfil.generos_rechazados %}
-        <h4 class="mini-title">Géneros que no te gustan</h4>
-        <div class="tag-list">
-          {% for g in perfil.generos_rechazados %}
-          <span class="tag tag-dislike">{{ g }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
       </div>
 
     </div>
 
-    <!-- Explorar desde el perfil también -->
-    {% if generos %}
-    <section>
-      <h2 class="section-title">🎸 Explorar por género</h2>
-      <div class="genre-tabs" id="genreTabs">
-        {% for g in generos %}
-        <button class="genre-tab" data-genre="{{ g }}">{{ g }}</button>
+    <!-- CANCIONES FAVORITAS -->
+    <section class="card" id="secFavoritas">
+      <h2 class="card-title">♥ Canciones favoritas</h2>
+      {% if perfil.canciones_gustadas %}
+      <div class="song-grid" id="gridFavoritas">
+        {% for c in perfil.canciones_gustadas %}
+        <div class="song-card" data-id="{{ c.id }}">
+          <div class="song-meta">
+            <div class="song-cover">🎵</div>
+            <div>
+              <div class="song-title">{{ c.titulo }}</div>
+              <div class="song-artist">{{ c.artista }}</div>
+              <div class="song-tags">
+                <span class="tag tag-genre">{{ c.genero }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="song-actions">
+            <span class="song-rating">★ {{ "%.1f"|format(c.calificacion) }}</span>
+            <span class="song-duration">{{ c.duracion }}</span>
+            <button class="btn-icon btn-play-song" title="Reproducir"
+              onclick="playSong('{{ c.titulo|replace("'","\\'") }}','{{ c.artista|replace("'","\\'") }}')">▶</button>
+            <button class="btn-icon btn-dislike" title="Mover a no me gusta"
+              onclick="moverCancion('{{ c.id }}','fav_a_nope',this)">✕</button>
+            <button class="btn-icon" title="Quitar de favoritas" style="font-size:0.8rem"
+              onclick="moverCancion('{{ c.id }}','quitar_fav',this)">🗑</button>
+          </div>
+        </div>
         {% endfor %}
       </div>
-      <div class="song-grid" id="gridGenero"></div>
+      {% else %}
+      <p style="color:var(--muted);padding:16px">Aún no tienes canciones favoritas.</p>
+      {% endif %}
+    </section>
+
+    <!-- CANCIONES NO ME GUSTAN -->
+    <section class="card" id="secNoGustan">
+      <h2 class="card-title">✕ No me gustan</h2>
+      {% if perfil.canciones_no_gustadas %}
+      <div class="song-grid" id="gridNoGustan">
+        {% for c in perfil.canciones_no_gustadas %}
+        <div class="song-card" data-id="{{ c.id }}">
+          <div class="song-meta">
+            <div class="song-cover">🎵</div>
+            <div>
+              <div class="song-title">{{ c.titulo }}</div>
+              <div class="song-artist">{{ c.artista }}</div>
+              <div class="song-tags">
+                <span class="tag tag-genre">{{ c.genero }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="song-actions">
+            <span class="song-rating">★ {{ "%.1f"|format(c.calificacion) }}</span>
+            <span class="song-duration">{{ c.duracion }}</span>
+            <button class="btn-icon btn-play-song" title="Reproducir"
+              onclick="playSong('{{ c.titulo|replace("'","\\'") }}','{{ c.artista|replace("'","\\'") }}')">▶</button>
+            <button class="btn-icon btn-like" title="Mover a favoritas"
+              onclick="moverCancion('{{ c.id }}','nope_a_fav',this)">♥</button>
+            <button class="btn-icon" title="Quitar de no me gustan" style="font-size:0.8rem"
+              onclick="moverCancion('{{ c.id }}','quitar_nope',this)">🗑</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p style="color:var(--muted);padding:16px">No has descartado ninguna canción.</p>
+      {% endif %}
+    </section>
+
+    <!-- GÉNEROS FAVORITOS -->
+    {% if perfil.generos_favoritos %}
+    <section class="card">
+      <h2 class="card-title">🎸 Géneros favoritos</h2>
+      <div class="genre-tabs">
+        {% for g in perfil.generos_favoritos %}
+        <a href="{{ url_for('genero', nombre_genero=g) }}" class="genre-tab">{{ g }}</a>
+        {% endfor %}
+      </div>
     </section>
     {% endif %}
 
-  </div>
-
-  <!-- PLAYER GLOBAL (mismo que en dashboard) -->
-  <div id="player" class="player hidden">
-    <div class="player-info">
-      <div class="player-title" id="playerTitle">—</div>
-      <div class="player-artist" id="playerArtist">—</div>
-    </div>
-    <div class="player-controls">
-      <audio id="audioEl" preload="none"></audio>
-      <button id="btnPlay" class="btn-play" onclick="togglePlay()">▶</button>
-      <div class="progress-wrap">
-        <span id="timeCurrent">0:00</span>
-        <input type="range" id="progressBar" value="0" min="0" max="30" step="0.1" oninput="seekAudio(this.value)">
-        <span id="timeTotal">0:30</span>
+    <!-- ARTISTAS FAVORITOS -->
+    {% if perfil.artistas_favoritos %}
+    <section class="card">
+      <h2 class="card-title">🎤 Artistas favoritos</h2>
+      <div class="artists-grid">
+        {% for a in perfil.artistas_favoritos %}
+        <a href="{{ url_for('artista', nombre_artista=a) }}" class="artist-chip">
+          <span class="artist-chip-icon">🎤</span>
+          <span>{{ a }}</span>
+        </a>
+        {% endfor %}
       </div>
-      <button class="btn-close-player" onclick="closePlayer()">✕</button>
-    </div>
-  </div>
+    </section>
+    {% endif %}
 
-  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <!-- PLAYER GLOBAL (mismo que en dashboard) -->
+    <div id="player" class="player hidden">
+      <div class="player-info">
+        <div class="player-title" id="playerTitle">—</div>
+        <div class="player-artist" id="playerArtist">—</div>
+      </div>
+      <div class="player-controls">
+        <audio id="audioEl" preload="none"></audio>
+        <button id="btnPlay" class="btn-play" onclick="togglePlay()">▶</button>
+        <div class="progress-wrap">
+          <span id="timeCurrent">0:00</span>
+          <input type="range" id="progressBar" value="0" min="0" max="30" step="0.1" oninput="seekAudio(this.value)">
+          <span id="timeTotal">0:30</span>
+        </div>
+        <button class="btn-close-player" onclick="closePlayer()">✕</button>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
+
 </html>

@@ -70,27 +70,42 @@ class AgentePerfilUsuario:
         estado_animo = self._local(g.value(u, MM.tieneEstadoDeAnimo))
         contexto = self._local(g.value(u, MM.estaEnContexto))
 
-        canciones_gustadas = [
+        def enriquecer_cancion(cancion_id):
+            """Retorna dict completo de una canción desde el grafo."""
+            uri = MM[cancion_id]
+            titulo = str(g.value(uri, MM.titulo) or cancion_id)
+            artista = str(g.value(uri, MM.artista) or "")
+            genero_uri = g.value(uri, MM.perteneceAGenero)
+            genero = self._local(genero_uri) if genero_uri else ""
+            calificacion = float(g.value(uri, MM.calificacion) or 0)
+            duracion = str(g.value(uri, MM.duracion) or "")
+            return {
+                "id": cancion_id,
+                "titulo": titulo,
+                "artista": artista,
+                "genero": genero,
+                "calificacion": calificacion,
+                "duracion": duracion,
+            }
+
+        canciones_gustadas_ids = [
             self._local(c) for c in g.objects(u, MM.leGusta)
         ]
-        canciones_no_gustadas = [
+        canciones_no_gustadas_ids = [
             self._local(c) for c in g.objects(u, MM.noLeGusta)
         ]
 
-        # Géneros favoritos (inferidos de canciones gustadas)
+        canciones_gustadas = [enriquecer_cancion(c) for c in canciones_gustadas_ids]
+        canciones_no_gustadas = [enriquecer_cancion(c) for c in canciones_no_gustadas_ids]
+
         generos_favoritos = list(
-            {self._local(g.value(MM[c], MM.perteneceAGenero)) for c in canciones_gustadas
-             if g.value(MM[c], MM.perteneceAGenero)}
+            {c["genero"] for c in canciones_gustadas if c["genero"]}
         )
-        # Artistas favoritos
         artistas_favoritos = list(
-            {str(g.value(MM[c], MM.artista) or "") for c in canciones_gustadas
-             if g.value(MM[c], MM.artista)}
+            {c["artista"] for c in canciones_gustadas if c["artista"]}
         )
-        # Géneros rechazados
         generos_rechazados = list(
-            {self._local(g.value(MM[c], MM.perteneceAGenero)) for c in canciones_no_gustadas
-             if g.value(MM[c], MM.perteneceAGenero)}
+            {c["genero"] for c in canciones_no_gustadas if c["genero"]}
         )
 
         return {
@@ -101,9 +116,9 @@ class AgentePerfilUsuario:
             "contexto": contexto,
             "canciones_gustadas": canciones_gustadas,
             "canciones_no_gustadas": canciones_no_gustadas,
-            "generos_favoritos": [g for g in generos_favoritos if g],
-            "artistas_favoritos": [a for a in artistas_favoritos if a],
-            "generos_rechazados": [g for g in generos_rechazados if g],
+            "generos_favoritos": generos_favoritos,
+            "artistas_favoritos": artistas_favoritos,
+            "generos_rechazados": generos_rechazados,
         }
 
     def actualizar_estado_animo(self, usuario_id: str, estado_animo: str):
@@ -138,6 +153,22 @@ class AgentePerfilUsuario:
         g.remove((u, MM.leGusta, c))
         if (u, MM.noLeGusta, c) not in g:
             g.add((u, MM.noLeGusta, c))
+        self._guardar_grafo(g)
+
+    def quitar_cancion_gustada(self, usuario_id: str, cancion_id: str):
+        """Quita una canción de la lista de favoritas."""
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
+        c = MM[cancion_id]
+        g.remove((u, MM.leGusta, c))
+        self._guardar_grafo(g)
+
+    def quitar_cancion_no_gustada(self, usuario_id: str, cancion_id: str):
+        """Quita una canción de la lista de no me gustan."""
+        g = self._cargar_grafo()
+        u = MM[usuario_id]
+        c = MM[cancion_id]
+        g.remove((u, MM.noLeGusta, c))
         self._guardar_grafo(g)
 
     # ──────────────────────────────────────────────
