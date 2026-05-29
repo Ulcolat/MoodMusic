@@ -127,7 +127,7 @@ SEARCH_QUERIES = [
     "Manuel Turizo", "Blessd", "Ryan Castro", "Mora", "Eladio Carrion",
     "Lunay", "Jhayco", "Dimelo Flow", "Kevvo", "Justin Quiles", "Rafa Pabön",
     "Lenny Tavarez", "Duki", "Trueno", "Bizarrap", "Nathy Peluso",
-    "Paulo Londra", "Big One", "YSY A", "Ca7riel",
+    "Paulo Londra", "Big One", "YSY A", "Ca7riel", "Álvaro Díaz",
     # Pop internacional
     "The Weeknd", "Harry Styles", "Ed Sheeran", "Dua Lipa", "Olivia Rodrigo",
     "Billie Eilish", "Post Malone", "Justin Bieber", "Ariana Grande", "Taylor Swift",
@@ -257,13 +257,13 @@ def main():
     songs = []
     
     for query in SEARCH_QUERIES:
-        if len(songs) >= 2500:
+        if len(songs) >= 8000:
             break
         print(f"Buscando: {query} ({len(songs)} canciones hasta ahora)")
         results = deezer_search(query, limit=50)
         
         for track in results:
-            if len(songs) >= 2500:
+            if len(songs) >= 8000:
                 break
             
             title = track.get("title_short") or track.get("title", "")
@@ -317,7 +317,7 @@ def main():
     print(f"\nTotal canciones recolectadas: {len(songs)}")
     
     # Leer TTL existente
-    with open("datos/grafo.ttl", "r", encoding="utf-8") as f:
+    with open("grafo.ttl", "r", encoding="utf-8") as f:
         existing = f.read()
     
     # Encontrar el número más alto de canción existente
@@ -366,7 +366,7 @@ def main():
             genre_declarations.append(f"\nmm:{g} a mm:Genero .\n")
     
     # Append al grafo
-    with open("datos/grafo.ttl", "a", encoding="utf-8") as f:
+    with open("grafo.ttl", "a", encoding="utf-8") as f:
         f.write("\n")
         for part in new_ttl_parts:
             f.write("\n" + part)
@@ -375,7 +375,7 @@ def main():
     
     total_new = len(new_ttl_parts)
     print(f"Se agregaron {total_new} nuevas canciones al grafo.")
-    print("Archivo datos/grafo.ttl actualizado.")
+    print("Archivo grafo.ttl actualizado.")
 
 if __name__ == "__main__":
     main()

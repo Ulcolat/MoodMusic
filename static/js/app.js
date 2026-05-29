@@ -105,6 +105,25 @@ if (formRec) {
       secRec.classList.remove('hidden');
       secRec.scrollIntoView({ behavior: 'smooth', block: 'start' });
       showToast(`🎵 ${canciones.length} canciones recomendadas`);
+
+      // Actualizar el badge de estado de ánimo en la esquina superior
+      try {
+        const selAnimo = document.getElementById('selAnimo');
+        const selCtx = document.getElementById('selContexto');
+        let badge = document.querySelector('.current-mood-badge');
+        const animoText = selAnimo ? selAnimo.value : '';
+        const ctxText = selCtx ? selCtx.value : '';
+        if (!badge && (animoText || ctxText)) {
+          badge = document.createElement('div');
+          badge.className = 'current-mood-badge';
+          document.querySelector('.page-header').appendChild(badge);
+        }
+        if (badge) {
+          badge.innerHTML = `<span>${esc(animoText)}</span> · <span>${esc(ctxText)}</span>`;
+        }
+      } catch (e) {
+        // no crítico, continuar
+      }
     } catch (err) {
       showToast('Error al obtener recomendaciones');
     } finally {

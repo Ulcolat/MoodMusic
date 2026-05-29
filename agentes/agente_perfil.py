@@ -62,16 +62,48 @@ class AgentePerfilUsuario:
         self._guardar_grafo(g)
 
     def obtener_perfil(self, usuario_id: str) -> dict:
+        # Usar SPARQL para recuperar estado, contexto y listas de likes/no-likes
         g = self._cargar_grafo()
         u = MM[usuario_id]
 
         nombre = str(g.value(u, MM.nombre) or "")
         email = str(g.value(u, MM.email) or "")
-        estado_animo = self._local(g.value(u, MM.tieneEstadoDeAnimo))
-        contexto = self._local(g.value(u, MM.estaEnContexto))
+
+        q = """
+        PREFIX mm: <http://www.semanticweb.org/moodmusic#>
+        SELECT ?estado ?ctx (GROUP_CONCAT(DISTINCT STR(?lg); separator="|") AS ?likes) (GROUP_CONCAT(DISTINCT STR(?nl); separator="|") AS ?nolikes)
+        WHERE {
+          OPTIONAL { ?u mm:tieneEstadoDeAnimo ?estado. }
+          OPTIONAL { ?u mm:estaEnContexto ?ctx. }
+          OPTIONAL { ?u mm:leGusta ?lg. }
+          OPTIONAL { ?u mm:noLeGusta ?nl. }
+        }
+        GROUP BY ?estado ?ctx
+        """
+
+        res = g.query(q, initBindings={"u": u})
+
+        estado_animo = ""
+        contexto = ""
+        likes_raw = ""
+        nolikes_raw = ""
+        for row in res:
+            estado_animo = self._local(row[0]) if row[0] is not None else ""
+            contexto = self._local(row[1]) if row[1] is not None else ""
+            likes_raw = str(row[2]) if row[2] is not None else ""
+            nolikes_raw = str(row[3]) if row[3] is not None else ""
+            break
+
+        def _parse_uri_list(s):
+            if not s:
+                return []
+            vals = [v for v in s.split("|") if v]
+            return [self._local(v) for v in vals]
+
+        canciones_gustadas_ids = _parse_uri_list(likes_raw)
+        canciones_no_gustadas_ids = _parse_uri_list(nolikes_raw)
 
         def enriquecer_cancion(cancion_id):
-            """Retorna dict completo de una canción desde el grafo."""
             uri = MM[cancion_id]
             titulo = str(g.value(uri, MM.titulo) or cancion_id)
             artista = str(g.value(uri, MM.artista) or "")
@@ -88,25 +120,12 @@ class AgentePerfilUsuario:
                 "duracion": duracion,
             }
 
-        canciones_gustadas_ids = [
-            self._local(c) for c in g.objects(u, MM.leGusta)
-        ]
-        canciones_no_gustadas_ids = [
-            self._local(c) for c in g.objects(u, MM.noLeGusta)
-        ]
-
         canciones_gustadas = [enriquecer_cancion(c) for c in canciones_gustadas_ids]
         canciones_no_gustadas = [enriquecer_cancion(c) for c in canciones_no_gustadas_ids]
 
-        generos_favoritos = list(
-            {c["genero"] for c in canciones_gustadas if c["genero"]}
-        )
-        artistas_favoritos = list(
-            {c["artista"] for c in canciones_gustadas if c["artista"]}
-        )
-        generos_rechazados = list(
-            {c["genero"] for c in canciones_no_gustadas if c["genero"]}
-        )
+        generos_favoritos = list({c["genero"] for c in canciones_gustadas if c["genero"]})
+        artistas_favoritos = list({c["artista"] for c in canciones_gustadas if c["artista"]})
+        generos_rechazados = list({c["genero"] for c in canciones_no_gustadas if c["genero"]})
 
         return {
             "usuario_id": usuario_id,
@@ -115,7 +134,9 @@ class AgentePerfilUsuario:
             "estado_animo": estado_animo,
             "contexto": contexto,
             "canciones_gustadas": canciones_gustadas,
+            # Lista detallada (para UI) y lista de IDs (para lógica interna)
             "canciones_no_gustadas": canciones_no_gustadas,
+            "canciones_no_gustadas_ids": canciones_no_gustadas_ids,
             "generos_favoritos": generos_favoritos,
             "artistas_favoritos": artistas_favoritos,
             "generos_rechazados": generos_rechazados,

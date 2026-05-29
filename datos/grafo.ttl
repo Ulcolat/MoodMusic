@@ -343,15 +343,6 @@ mm:C_About_A_Girl_Nirvana a mm:Cancion ;
     mm:perteneceAGenero mm:Rock ;
     mm:titulo "About A Girl"^^xsd:string .
 
-mm:C_About_You_The_1975 a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "The 1975"^^xsd:string ;
-    mm:calificacion "3.5"^^xsd:float ;
-    mm:duracion "5:26"^^xsd:string ;
-    mm:perteneceAGenero mm:Indie ;
-    mm:titulo "About You"^^xsd:string .
-
 mm:C_Acróstico_Milan__Sasha_Shakira a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -2278,15 +2269,6 @@ mm:C_Corazón_Roto_pt_3_Brray a mm:Cancion ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "Corazón Roto pt. 3"^^xsd:string .
 
-mm:C_Corazón_feat_Nego_do_Borel_Maluma a mm:Cancion ;
-    mm:aptoParaAnimo mm:Romantico ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Maluma"^^xsd:string ;
-    mm:calificacion "3.7"^^xsd:float ;
-    mm:duracion "3:04"^^xsd:string ;
-    mm:perteneceAGenero mm:Urbano ;
-    mm:titulo "Corazón (feat. Nego do Borel)"^^xsd:string .
-
 mm:C_Cordillera_Los_Enanitos_Verdes a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -3159,15 +3141,6 @@ mm:C_Earned_It_Fifty_Shades_Of_Grey_The_Weeknd a mm:Cancion ;
     mm:duracion "4:38"^^xsd:string ;
     mm:perteneceAGenero mm:Pop ;
     mm:titulo "Earned It (Fifty Shades Of Grey)"^^xsd:string .
-
-mm:C_Easy_On_Me_Adele a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Adele"^^xsd:string ;
-    mm:calificacion "4.6"^^xsd:float ;
-    mm:duracion "3:44"^^xsd:string ;
-    mm:perteneceAGenero mm:Pop ;
-    mm:titulo "Easy On Me"^^xsd:string .
 
 mm:C_Eclipse_Pink_Floyd a mm:Cancion ;
     mm:aptoParaAnimo mm:Estresado ;
@@ -5580,15 +5553,6 @@ mm:C_Jaded_Deadmau5 a mm:Cancion ;
     mm:duracion "8:50"^^xsd:string ;
     mm:perteneceAGenero mm:Electronic ;
     mm:titulo "Jaded"^^xsd:string .
-
-mm:C_Janice_STFU_Drake a mm:Cancion ;
-    mm:aptoParaAnimo mm:Tranquilo ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Drake"^^xsd:string ;
-    mm:calificacion "4.9"^^xsd:float ;
-    mm:duracion "3:57"^^xsd:string ;
-    mm:perteneceAGenero mm:HipHop ;
-    mm:titulo "Janice STFU"^^xsd:string .
 
 mm:C_Jardim_Botânico_Lofi_Chill_Brazil a mm:Cancion ;
     mm:aptoParaAnimo mm:Estresado ;
@@ -9316,15 +9280,6 @@ mm:C_Rap_God_Eminem a mm:Cancion ;
     mm:perteneceAGenero mm:HipHop ;
     mm:titulo "Rap God"^^xsd:string .
 
-mm:C_Rape_Me_Nirvana a mm:Cancion ;
-    mm:aptoParaAnimo mm:Triste ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Nirvana"^^xsd:string ;
-    mm:calificacion "3.7"^^xsd:float ;
-    mm:duracion "2:50"^^xsd:string ;
-    mm:perteneceAGenero mm:Rock ;
-    mm:titulo "Rape Me"^^xsd:string .
-
 mm:C_Ready_For_It_Taylor_Swift a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Casa ;
@@ -9882,15 +9837,6 @@ mm:C_SOLEAO_Myke_Towers a mm:Cancion ;
     mm:duracion "3:38"^^xsd:string ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "SOLEAO"^^xsd:string .
-
-mm:C_SORRY_4_THAT_MUCH_Feid a mm:Cancion ;
-    mm:aptoParaAnimo mm:Tranquilo ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Feid"^^xsd:string ;
-    mm:calificacion "3.5"^^xsd:float ;
-    mm:duracion "3:27"^^xsd:string ;
-    mm:perteneceAGenero mm:Urbano ;
-    mm:titulo "SORRY 4 THAT MUCH"^^xsd:string .
 
 mm:C_SOS_Avicii a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
@@ -10890,15 +10836,6 @@ mm:C_Starboy_The_Weeknd a mm:Cancion ;
     mm:duracion "3:50"^^xsd:string ;
     mm:perteneceAGenero mm:Pop ;
     mm:titulo "Starboy"^^xsd:string .
-
-mm:C_Stargirl_Interlude_The_Weeknd a mm:Cancion ;
-    mm:aptoParaAnimo mm:Romantico ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "The Weeknd"^^xsd:string ;
-    mm:calificacion "3.7"^^xsd:float ;
-    mm:duracion "1:51"^^xsd:string ;
-    mm:perteneceAGenero mm:RnB ;
-    mm:titulo "Stargirl Interlude"^^xsd:string .
 
 mm:C_Start_A_Fire_John_Legend a mm:Cancion ;
     mm:aptoParaAnimo mm:Romantico ;
@@ -11934,15 +11871,6 @@ mm:C_The_watcher_Chillhop_Guitar a mm:Cancion ;
     mm:duracion "2:50"^^xsd:string ;
     mm:perteneceAGenero mm:LoFi ;
     mm:titulo "The watcher"^^xsd:string .
-
-mm:C_Theme_From_New_York_New_York_2008_Remastered_Frank_Sinatra a mm:Cancion ;
-    mm:aptoParaAnimo mm:Romantico ;
-    mm:aptoParaContexto mm:Casa ;
-    mm:artista "Frank Sinatra"^^xsd:string ;
-    mm:calificacion "3.6"^^xsd:float ;
-    mm:duracion "3:26"^^xsd:string ;
-    mm:perteneceAGenero mm:Jazz ;
-    mm:titulo "Theme From New York, New York (2008 Remastered)"^^xsd:string .
 
 mm:C_There_for_You_Martin_Garrix a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
@@ -14007,7 +13935,7 @@ mm:C_寒意_放松的节拍 a mm:Cancion ;
 
 mm:usuario123 a mm:Usuario ;
     mm:email "dubanblanco123@gmail.com"^^xsd:string ;
-    mm:estaEnContexto mm:Descanso ;
+    mm:estaEnContexto mm:Gaming ;
     mm:leGusta mm:C_BAILE_INoLVIDABLE_Bad_Bunny,
         mm:C_Ché_Ché_Colé_Willie_Colón,
         mm:C_Como_en_el_Idilio_Marc_Anthony,
@@ -14019,12 +13947,29 @@ mm:usuario123 a mm:Usuario ;
         mm:C_La_Vida_Es_Un_Carnaval_Celia_Cruz,
         mm:C_Oye_Cómo_Va_Celia_Cruz,
         mm:C_PERRO_NEGRO_Bad_Bunny,
+        mm:C_SORRY_4_THAT_MUCH_Feid,
         mm:C_Si_Antes_Te_Hubiera_Conocido_KAROL_G,
         mm:C_Tití_Me_Preguntó_Bad_Bunny,
         mm:C_VOY_A_LLeVARTE_PA_PR_Bad_Bunny,
         mm:C_Yo_Perreo_Sola_Bad_Bunny ;
+    mm:noLeGusta mm:C_About_You_The_1975,
+        mm:C_Corazón_feat_Nego_do_Borel_Maluma,
+        mm:C_Easy_On_Me_Adele,
+        mm:C_Janice_STFU_Drake,
+        mm:C_Rape_Me_Nirvana,
+        mm:C_Stargirl_Interlude_The_Weeknd,
+        mm:C_Theme_From_New_York_New_York_2008_Remastered_Frank_Sinatra ;
     mm:nombre "Duban"^^xsd:string ;
-    mm:tieneEstadoDeAnimo mm:Melancolico .
+    mm:tieneEstadoDeAnimo mm:Tranquilo .
+
+mm:C_About_You_The_1975 a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "The 1975"^^xsd:string ;
+    mm:calificacion "3.5"^^xsd:float ;
+    mm:duracion "5:26"^^xsd:string ;
+    mm:perteneceAGenero mm:Indie ;
+    mm:titulo "About You"^^xsd:string .
 
 mm:C_BAILE_INoLVIDABLE_Bad_Bunny a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
@@ -14053,6 +13998,15 @@ mm:C_Como_en_el_Idilio_Marc_Anthony a mm:Cancion ;
     mm:perteneceAGenero mm:Salsa ;
     mm:titulo "Como en el Idilio"^^xsd:string .
 
+mm:C_Corazón_feat_Nego_do_Borel_Maluma a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Maluma"^^xsd:string ;
+    mm:calificacion "3.7"^^xsd:float ;
+    mm:duracion "3:04"^^xsd:string ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "Corazón (feat. Nego do Borel)"^^xsd:string .
+
 mm:C_DtMF_Bad_Bunny a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -14071,6 +14025,15 @@ mm:C_DÁKITI_Bad_Bunny a mm:Cancion ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "DÁKITI"^^xsd:string .
 
+mm:C_Easy_On_Me_Adele a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Adele"^^xsd:string ;
+    mm:calificacion "4.6"^^xsd:float ;
+    mm:duracion "3:44"^^xsd:string ;
+    mm:perteneceAGenero mm:Pop ;
+    mm:titulo "Easy On Me"^^xsd:string .
+
 mm:C_Hasta_Abajo_Don_Omar a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -14079,6 +14042,15 @@ mm:C_Hasta_Abajo_Don_Omar a mm:Cancion ;
     mm:duracion "3:53"^^xsd:string ;
     mm:perteneceAGenero mm:Reggaeton ;
     mm:titulo "Hasta Abajo"^^xsd:string .
+
+mm:C_Janice_STFU_Drake a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Drake"^^xsd:string ;
+    mm:calificacion "4.9"^^xsd:float ;
+    mm:duracion "3:57"^^xsd:string ;
+    mm:perteneceAGenero mm:HipHop ;
+    mm:titulo "Janice STFU"^^xsd:string .
 
 mm:C_LUNA_Feid a mm:Cancion ;
     mm:aptoParaAnimo mm:Tranquilo ;
@@ -14125,6 +14097,24 @@ mm:C_PERRO_NEGRO_Bad_Bunny a mm:Cancion ;
     mm:perteneceAGenero mm:Reggaeton ;
     mm:titulo "PERRO NEGRO"^^xsd:string .
 
+mm:C_Rape_Me_Nirvana a mm:Cancion ;
+    mm:aptoParaAnimo mm:Triste ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Nirvana"^^xsd:string ;
+    mm:calificacion "3.7"^^xsd:float ;
+    mm:duracion "2:50"^^xsd:string ;
+    mm:perteneceAGenero mm:Rock ;
+    mm:titulo "Rape Me"^^xsd:string .
+
+mm:C_SORRY_4_THAT_MUCH_Feid a mm:Cancion ;
+    mm:aptoParaAnimo mm:Tranquilo ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Feid"^^xsd:string ;
+    mm:calificacion "3.5"^^xsd:float ;
+    mm:duracion "3:27"^^xsd:string ;
+    mm:perteneceAGenero mm:Urbano ;
+    mm:titulo "SORRY 4 THAT MUCH"^^xsd:string .
+
 mm:C_Si_Antes_Te_Hubiera_Conocido_KAROL_G a mm:Cancion ;
     mm:aptoParaAnimo mm:Alegre ;
     mm:aptoParaContexto mm:Fiesta ;
@@ -14133,6 +14123,24 @@ mm:C_Si_Antes_Te_Hubiera_Conocido_KAROL_G a mm:Cancion ;
     mm:duracion "3:15"^^xsd:string ;
     mm:perteneceAGenero mm:Urbano ;
     mm:titulo "Si Antes Te Hubiera Conocido"^^xsd:string .
+
+mm:C_Stargirl_Interlude_The_Weeknd a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "The Weeknd"^^xsd:string ;
+    mm:calificacion "3.7"^^xsd:float ;
+    mm:duracion "1:51"^^xsd:string ;
+    mm:perteneceAGenero mm:RnB ;
+    mm:titulo "Stargirl Interlude"^^xsd:string .
+
+mm:C_Theme_From_New_York_New_York_2008_Remastered_Frank_Sinatra a mm:Cancion ;
+    mm:aptoParaAnimo mm:Romantico ;
+    mm:aptoParaContexto mm:Casa ;
+    mm:artista "Frank Sinatra"^^xsd:string ;
+    mm:calificacion "3.6"^^xsd:float ;
+    mm:duracion "3:26"^^xsd:string ;
+    mm:perteneceAGenero mm:Jazz ;
+    mm:titulo "Theme From New York, New York (2008 Remastered)"^^xsd:string .
 
 mm:C_Tití_Me_Preguntó_Bad_Bunny a mm:Cancion ;
     mm:aptoParaAnimo mm:Energico ;

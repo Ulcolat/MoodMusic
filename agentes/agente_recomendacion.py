@@ -71,6 +71,7 @@ class AgenteRecomendacion:
         duracion = str(g.value(cancion_uri, MM.duracion) or "")
         animos = [str(x).split("#")[-1] for x in g.objects(cancion_uri, MM.aptoParaAnimo)]
         contextos = [str(x).split("#")[-1] for x in g.objects(cancion_uri, MM.aptoParaContexto)]
+
         return {
             "id": local,
             "titulo": titulo,
@@ -107,8 +108,8 @@ class AgenteRecomendacion:
           Nivel 2 — solo ánimo, sin contexto exacto   (score medio)
           Nivel 3 — cualquier canción no excluida     (relleno si grafo muy pequeño)
 
-        Dentro de cada nivel se aplica scoring por preferencias del usuario.
-        Los géneros rechazados se excluyen completamente (no solo penalizan).
+        Estrategia: usar consultas SPARQL para reducir candidatos (mejor rendimiento)
+        sin cambiar el scoring ni la semántica del resultado.
         """
         g = self._grafo()
         excluidas = set(canciones_no_gustadas or [])
@@ -119,48 +120,101 @@ class AgenteRecomendacion:
         def _score(c: dict, contexto_match: bool) -> float:
             score = 0.0
             if contexto_match:
-                score += 10.0          # contexto es PRIORITARIO, no solo +2
+                score += 10.0
             if c["genero"] in favs_g:
                 score += 4.0
             if c["artista"] in favs_a:
                 score += 6.0
             import random
             score += c["calificacion"] * 0.5
-            score += random.uniform(0,1.5)
+            score += random.uniform(0, 1.5)
             return score
 
+        # Preparar URIs para filtros SPARQL
+        excluidas_uris = [str(MM[s]) for s in excluidas]
+        rech_g_uris = [str(MM[g]) for g in rech_g]
+
+        prefixes = """
+PREFIX mm: <http://www.semanticweb.org/moodmusic#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+"""
+
+        def _build_where(animo=None, ctx=None):
+            where = ["?s rdf:type mm:Cancion ."]
+            if animo:
+                where.append(f"?s mm:aptoParaAnimo mm:{animo} .")
+            if ctx:
+                where.append(f"?s mm:aptoParaContexto mm:{ctx} .")
+            if rech_g_uris:
+                uris = ", ".join(f"<{u}>" for u in rech_g_uris)
+                where.append(f"FILTER NOT EXISTS {{ ?s mm:perteneceAGenero ?g . FILTER(?g IN ({uris})) }} .")
+            if excluidas_uris:
+                excl = ", ".join(f"<{u}>" for u in excluidas_uris)
+                where.append(f"FILTER (?s NOT IN ({excl})) .")
+            return where
+
+        def _query_song_uris(animo=None, ctx=None, limit=200):
+            where = _build_where(animo, ctx)
+            q = prefixes + "SELECT DISTINCT ?s WHERE { " + " ".join(where) + " } LIMIT %d" % limit
+            try:
+                res = g.query(q)
+                return [row.s for row in res]
+            except Exception:
+                # Fallback a recorrido clásico si SPARQL falla
+                return list(g.subjects(RDF.type, MM.Cancion))
+
+        nivel1_uris = _query_song_uris(animo=estado_animo, ctx=contexto, limit=300)
+        nivel2_uris = _query_song_uris(animo=estado_animo, ctx=None, limit=500)
+        nivel3_uris = _query_song_uris(animo=None, ctx=None, limit=1000)
+
+        seen = set()
         nivel1, nivel2, nivel3 = [], [], []
 
-        for cancion_uri in g.subjects(RDF.type, MM.Cancion):
-            c = self._cancion_dict(g, cancion_uri)
-
-            # Excluir canciones no gustadas
-            if c["id"] in excluidas:
+        for uri in nivel1_uris:
+            local = str(uri).split('#')[-1]
+            if local in seen:
                 continue
-
-            # Excluir géneros rechazados completamente
-            if c["genero"] in rech_g:
+            c = self._cancion_dict(g, uri)
+            if c['id'] in excluidas:
                 continue
+            if c['genero'] in rech_g:
+                continue
+            seen.add(c['id'])
+            nivel1.append((_score(c, True), c))
 
-            animo_ok = estado_animo in c.get("animos", [])
-            ctx_ok = contexto in c.get("contextos", [])
-
-            if animo_ok and ctx_ok:
-                nivel1.append((_score(c, True), c))
-            elif animo_ok:
+        for uri in nivel2_uris:
+            local = str(uri).split('#')[-1]
+            if local in seen:
+                continue
+            c = self._cancion_dict(g, uri)
+            if c['id'] in excluidas:
+                continue
+            if c['genero'] in rech_g:
+                continue
+            if estado_animo in c.get('animos', []):
+                seen.add(c['id'])
                 nivel2.append((_score(c, False), c))
-            else:
+
+        for uri in nivel3_uris:
+            local = str(uri).split('#')[-1]
+            if local in seen:
+                continue
+            c = self._cancion_dict(g, uri)
+            if c['id'] in excluidas:
+                continue
+            if c['genero'] in rech_g:
+                continue
+            if estado_animo not in c.get('animos', []):
+                seen.add(c['id'])
                 nivel3.append((_score(c, False), c))
 
         for nivel in (nivel1, nivel2, nivel3):
             nivel.sort(key=lambda x: x[0], reverse=True)
 
-        # Armar resultado priorizando nivel1, luego nivel2, luego nivel3
-        # Inyectar animo/contexto singular que coincide con lo pedido (para la UI)
         def _with_match(c, animo_val, ctx_val):
             out = dict(c)
-            out["animo"] = animo_val
-            out["contexto"] = ctx_val
+            out['animo'] = animo_val
+            out['contexto'] = ctx_val
             return out
 
         resultado = []
