@@ -132,3 +132,9 @@ Consulta la API pública de Deezer y agrega ≈2000 canciones al archivo `datos/
 ## Géneros soportados
 
 Pop, Rock, LoFi, Electronic, Jazz, RnB, Classical, HipHop, Reggaeton, Urbano, Latin, Indie, Salsa, Metal
+
+## Video demostrativo:
+
+https://github.com/user-attachments/assets/67ec9bb5-a410-4d3c-be24-e910fca486e3
+
+
